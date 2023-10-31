@@ -11,7 +11,7 @@ using api_portfolio.Data.DataContext;
 namespace api_portfolio.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231029221051_Initial")]
+    [Migration("20231031153130_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -21,13 +21,33 @@ namespace api_portfolio.Migrations
                 .HasAnnotation("ProductVersion", "6.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("api_portafolio.entities.users.AboutMe", b =>
+            modelBuilder.Entity("api_portafolio.Entities.TechnicalSkills.Technology", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
-                    b.Property<string>("About_me")
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<long?>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Technology");
+                });
+
+            modelBuilder.Entity("api_portafolio.Entities.Users.User", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("longtext");
 
@@ -37,37 +57,17 @@ namespace api_portfolio.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AboutMe");
+                    b.ToTable("User");
                 });
 
-            modelBuilder.Entity("api_portafolio.entities.users.Technology", b =>
+            modelBuilder.Entity("api_portafolio.Entities.TechnicalSkills.Technology", b =>
                 {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("AboutMeId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AboutMeId");
-
-                    b.ToTable("Technology");
-                });
-
-            modelBuilder.Entity("api_portafolio.entities.users.Technology", b =>
-                {
-                    b.HasOne("api_portafolio.entities.users.AboutMe", null)
+                    b.HasOne("api_portafolio.Entities.Users.User", null)
                         .WithMany("Technologies")
-                        .HasForeignKey("AboutMeId");
+                        .HasForeignKey("UserId");
                 });
 
-            modelBuilder.Entity("api_portafolio.entities.users.AboutMe", b =>
+            modelBuilder.Entity("api_portafolio.Entities.Users.User", b =>
                 {
                     b.Navigation("Technologies");
                 });

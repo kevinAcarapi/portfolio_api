@@ -13,17 +13,17 @@ namespace api_portfolio.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "AboutMe",
+                name: "User",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    About_me = table.Column<string>(type: "longtext", nullable: false),
+                    Description = table.Column<string>(type: "longtext", nullable: false),
                     Profile_photo = table.Column<string>(type: "longtext", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AboutMe", x => x.Id);
+                    table.PrimaryKey("PK_User", x => x.Id);
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
 
@@ -34,23 +34,23 @@ namespace api_portfolio.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
                     Description = table.Column<string>(type: "longtext", nullable: false),
-                    AboutMeId = table.Column<long>(type: "bigint", nullable: true)
+                    UserId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Technology", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Technology_AboutMe_AboutMeId",
-                        column: x => x.AboutMeId,
-                        principalTable: "AboutMe",
+                        name: "FK_Technology_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
                         principalColumn: "Id");
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Technology_AboutMeId",
+                name: "IX_Technology_UserId",
                 table: "Technology",
-                column: "AboutMeId");
+                column: "UserId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -59,7 +59,7 @@ namespace api_portfolio.Migrations
                 name: "Technology");
 
             migrationBuilder.DropTable(
-                name: "AboutMe");
+                name: "User");
         }
     }
 }

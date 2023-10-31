@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using api_portafolio.Entities;
 using api_portafolio.Entities.Users;
+using api_portafolio.Entities.TechnicalSkills;
 namespace api_portfolio.Data.DataContext;
 
 public class DataContext : DbContext 
@@ -10,7 +11,7 @@ public class DataContext : DbContext
 
     }
 
-    public DbSet<AboutMe>? AboutUs { get; set; }
+    public DbSet<User>? Users { get; set; }
 
-    public DbSet<AboutMe>? Technologies { get; set; }
+    public DbSet<User>? Technologies { get; set; }
 }

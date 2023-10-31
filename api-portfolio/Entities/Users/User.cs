@@ -1,7 +1,7 @@
 namespace api_portafolio.Entities.Users;
 using api_portafolio.Entities.TechnicalSkills;
 
-public class Users
+public class User
 {
     private long id = 0;
     public long Id 
@@ -15,16 +15,16 @@ public class Users
             this.id = value;
         }
     }
-    private string about_me = "";
-    public string About_me 
+    private string description = "";
+    public string Description 
     {
         get 
         {
-            return this.about_me;
+            return this.description;
         }
         set
         {
-            this.about_me = value;
+            this.description = value;
         } 
     }
     private string profile_photo = "";
