@@ -1,4 +1,4 @@
-using api_portafolio.entities.users;
+using api_portafolio.Entities.Users;
 using api_portfolio.Data.DataContext;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

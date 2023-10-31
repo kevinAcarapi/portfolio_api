@@ -1,6 +1,7 @@
-namespace api_portafolio.entities.users;
+namespace api_portafolio.Entities.Users;
+using api_portafolio.Entities.TechnicalSkills;
 
-public class AboutMe
+public class Users
 {
     private long id = 0;
     public long Id 

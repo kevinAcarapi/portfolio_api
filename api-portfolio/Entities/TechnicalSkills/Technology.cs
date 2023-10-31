@@ -1,4 +1,4 @@
-namespace api_portafolio.entities.users;
+namespace api_portafolio.Entities.TechnicalSkills;
 
 public class Technology 
 {
