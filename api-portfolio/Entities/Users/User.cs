@@ -1,5 +1,6 @@
 namespace api_portafolio.Entities.Users;
 using api_portafolio.Entities.TechnicalSkills;
+using api_portafolio.Entities.Cards;
 
 public class User
 {
@@ -14,6 +15,66 @@ public class User
         {
             this.id = value;
         }
+    }
+    private string nombre = "";
+    public string Nombre 
+    {
+        get 
+        {
+            return this.nombre;
+        }
+        set
+        {
+            this.nombre = value;
+        } 
+    }
+    private string apellido = "";
+    public string Apellido 
+    {
+        get 
+        {
+            return this.apellido;
+        }
+        set
+        {
+            this.apellido = value;
+        } 
+    }
+    private string profesion = "";
+    public string Profesion 
+    {
+        get 
+        {
+            return this.profesion;
+        }
+        set
+        {
+            this.profesion = value;
+        } 
+    }
+    private string gmail = "";
+    public string Gmail 
+    {
+        get 
+        {
+            return this.gmail;
+        }
+        set
+        {
+            this.gmail = value;
+        } 
+    }
+    private string curriculum = "";
+    public string Curriculum 
+    {
+        get 
+        {
+            return this.curriculum;
+        }
+        set
+        {
+            this.curriculum = value;
+        } 
     }
     private string description = "";
     public string Description 
@@ -54,7 +115,16 @@ public class User
             this.technologies = value;
         }
     }
-
-
-    
+    private List<Card>? cards;
+    public List<Card>? Cards 
+    {
+        get
+        {
+            return this.cards;       
+        }
+        set
+        {
+            this.cards = value;
+        }
+    }    
 }
