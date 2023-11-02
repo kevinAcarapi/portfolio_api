@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using api_portfolio.Data.DataContext;
 
@@ -10,9 +11,10 @@ using api_portfolio.Data.DataContext;
 namespace api_portfolio.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20231102205426_initial")]
+    partial class initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -37,10 +39,6 @@ namespace api_portfolio.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.Property<long?>("UserId")
                         .HasColumnType("bigint");
 
@@ -61,12 +59,7 @@ namespace api_portfolio.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<long?>("UserId")
-                        .HasColumnType("bigint");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Projects");
                 });
@@ -225,13 +218,6 @@ namespace api_portfolio.Migrations
                         .HasForeignKey("UserId");
                 });
 
-            modelBuilder.Entity("api_portafolio.Entities.Projects.Project", b =>
-                {
-                    b.HasOne("api_portafolio.Entities.Users.User", null)
-                        .WithMany("Projects")
-                        .HasForeignKey("UserId");
-                });
-
             modelBuilder.Entity("api_portafolio.Entities.Skills.Users_SoftSkills.User_SoftSkill", b =>
                 {
                     b.HasOne("api_portafolio.Entities.Skills.SoftSkills.SoftSkill", "SoftSkills")
@@ -290,8 +276,6 @@ namespace api_portfolio.Migrations
             modelBuilder.Entity("api_portafolio.Entities.Users.User", b =>
                 {
                     b.Navigation("Cards");
-
-                    b.Navigation("Projects");
 
                     b.Navigation("User_SoftSkills");
 

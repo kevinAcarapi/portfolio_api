@@ -1,3 +1,5 @@
+using api_portafolio.Entities.TechnologiesCatalog.Projects_technologiesCatalog;
+
 namespace api_portafolio.Entities.TechnologiesCatalog;
 
 public class TechnologyCatalog{
@@ -20,6 +22,18 @@ public class TechnologyCatalog{
         }
         set{
             this.project_technology = value;
+        }
+    }
+    private List<Project_technologyCatalog>? projects_technologiesCatalog; //cambiar a tipo objeto
+    public List<Project_technologyCatalog>? Projects_TechnologiesCatalogs 
+    {
+        get
+        {
+            return this.projects_technologiesCatalog;       
+        }
+        set
+        {
+            this.projects_technologiesCatalog = value;
         }
     }
 }

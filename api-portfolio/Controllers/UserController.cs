@@ -1,4 +1,5 @@
 using api_portafolio.Entities.Skills.TechnicalSkills;
+using api_portafolio.Entities.Skills.Users_TechnicalSkills;
 using api_portafolio.Entities.Users;
 using api_portfolio.Data.DataContext;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +26,7 @@ public class UserController : ControllerBase
         if (this.dataContext != null && this.dataContext.Users != null && this.dataContext.Technologies != null)
         {
             Technology? technology = await this.dataContext.Technologies.FindAsync(idType);
-            users = await this.dataContext.Users.Where(user => user.Id == idType).ToListAsync();
+            users = await this.dataContext.Users.Where(user => user.Id == id).ToListAsync();
         }
         return Ok(users);
     }

@@ -1,7 +1,8 @@
 namespace api_portafolio.Entities.Users;
-using api_portafolio.Entities.Skills.TechnicalSkills;
-using api_portafolio.Entities.Skills.SoftSkills;
+using api_portafolio.Entities.Projects;
+using api_portafolio.Entities.Skills.Users_SoftSkills;
 using api_portafolio.Entities.Cards;
+using api_portafolio.Entities.Skills.Users_TechnicalSkills;
 
 public class User
 {
@@ -104,28 +105,28 @@ public class User
     
     
 
-    private List<Technology>? technologies; //cambiar a tipo objeto
-    public List<Technology>? Technologies 
+    private List<User_TechnicalSkill>? user_technicalSkills; //cambiar a tipo objeto
+    public List<User_TechnicalSkill>? User_TechnicalSkills 
     {
         get
         {
-            return this.technologies;       
+            return this.user_technicalSkills;       
         }
         set
         {
-            this.technologies = value;
+            this.user_technicalSkills = value;
         }
     }
-    private List<SoftSkill>? softSkills; //cambiar a tipo objeto
-    public List<SoftSkill>? SoftSkills 
+    private List<User_SoftSkill>? user_SoftSkills;
+    public List<User_SoftSkill>? User_SoftSkills 
     {
         get
         {
-            return this.softSkills;       
+            return this.user_SoftSkills;       
         }
         set
         {
-            this.softSkills = value;
+            this.user_SoftSkills = value;
         }
     }
     private List<Card>? cards;
@@ -138,6 +139,18 @@ public class User
         set
         {
             this.cards = value;
+        }
+    }
+    private List<Project>? projects;
+    public List<Project>? Projects 
+    {
+        get
+        {
+            return this.projects;       
+        }
+        set
+        {
+            this.projects = value;
         }
     }    
 }

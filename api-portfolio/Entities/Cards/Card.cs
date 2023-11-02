@@ -26,6 +26,18 @@ public class Card
             this.imagen = value;
         } 
     }
+    private string title = "";
+    public string Title 
+    {
+        get 
+        {
+            return this.title;
+        }
+        set
+        {
+            this.title = value;
+        } 
+    }
     private string description = "";
     public string Description 
     {

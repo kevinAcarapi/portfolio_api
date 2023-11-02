@@ -1,5 +1,5 @@
 namespace api_portafolio.Entities.Projects;
-using api_portafolio.Entities.TechnologiesCatalog;
+using api_portafolio.Entities.TechnologiesCatalog.Projects_technologiesCatalog;
 
 public class Project{
     private long id = 0;
@@ -24,16 +24,16 @@ public class Project{
             this.technology_used = value;
         }
     }
-    private List<TechnologyCatalog>? technologiesCatalogs;
-    public List<TechnologyCatalog>? TechnologiesCatalogs 
+    private List<Project_technologyCatalog>? projects_technologiesCatalog;
+    public List<Project_technologyCatalog>? Projects_TechnologiesCatalogs 
     {
         get
         {
-            return this.technologiesCatalogs;       
+            return this.projects_technologiesCatalog;       
         }
         set
         {
-            this.technologiesCatalogs = value;
+            this.projects_technologiesCatalog = value;
         }
-    }  
+    }
 }
