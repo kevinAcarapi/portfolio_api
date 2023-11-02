@@ -55,7 +55,7 @@ namespace api_portfolio.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Softskills",
+                name: "SoftSkill",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
@@ -65,9 +65,9 @@ namespace api_portfolio.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Softskills", x => x.Id);
+                    table.PrimaryKey("PK_SoftSkill", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Softskills_Users_UserId",
+                        name: "FK_SoftSkill_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id");
@@ -100,8 +100,8 @@ namespace api_portfolio.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Softskills_UserId",
-                table: "Softskills",
+                name: "IX_SoftSkill_UserId",
+                table: "SoftSkill",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -116,7 +116,7 @@ namespace api_portfolio.Migrations
                 name: "Card");
 
             migrationBuilder.DropTable(
-                name: "Softskills");
+                name: "SoftSkill");
 
             migrationBuilder.DropTable(
                 name: "Technologies");

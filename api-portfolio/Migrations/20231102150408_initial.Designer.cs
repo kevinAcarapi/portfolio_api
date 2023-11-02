@@ -11,7 +11,7 @@ using api_portfolio.Data.DataContext;
 namespace api_portfolio.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231102014015_initial")]
+    [Migration("20231102150408_initial")]
     partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -66,7 +66,7 @@ namespace api_portfolio.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Softskills");
+                    b.ToTable("SoftSkill");
                 });
 
             modelBuilder.Entity("api_portafolio.Entities.Skills.TechnicalSkills.Technology", b =>

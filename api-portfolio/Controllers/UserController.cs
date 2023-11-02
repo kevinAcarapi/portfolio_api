@@ -1,3 +1,4 @@
+using api_portafolio.Entities.Skills.TechnicalSkills;
 using api_portafolio.Entities.Users;
 using api_portfolio.Data.DataContext;
 using Microsoft.AspNetCore.Mvc;
@@ -16,14 +17,15 @@ public class UserController : ControllerBase
         this.dataContext = dataContext;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<List<User>>> Get()
+    [HttpGet("{idType}")]
+    public async Task<ActionResult<List<User>>> Get(long idType)
     {
         List<User> users = new List<User>();
 
-        if(this.dataContext != null && this.dataContext.Users != null)
+        if (this.dataContext != null && this.dataContext.Users != null && this.dataContext.Technologies != null)
         {
-            users = await this.dataContext.Users.ToListAsync();   
+            Technology? technology = await this.dataContext.Technologies.FindAsync(idType);
+            users = await this.dataContext.Users.Where(user => user.Id == idType).ToListAsync();
         }
         return Ok(users);
     }

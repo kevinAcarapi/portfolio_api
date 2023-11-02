@@ -64,7 +64,7 @@ namespace api_portfolio.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Softskills");
+                    b.ToTable("SoftSkill");
                 });
 
             modelBuilder.Entity("api_portafolio.Entities.Skills.TechnicalSkills.Technology", b =>
