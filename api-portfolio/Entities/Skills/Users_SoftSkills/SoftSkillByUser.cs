@@ -3,7 +3,8 @@ using api_portafolio.Entities.Skills.SoftSkills;
 
 namespace api_portafolio.Entities.Skills.Users_SoftSkills;
 
-public class User_SoftSkill{
+public class SoftSkillByUser
+{
     private long id = 0;
     public long Id{
         get
@@ -15,8 +16,10 @@ public class User_SoftSkill{
             this.id = value;
         }
     }
+
     private User? users;
-    public User? Users{
+    public User? Users
+    {
         get
         {
             return this.users;
@@ -26,15 +29,17 @@ public class User_SoftSkill{
             this.users = value;
         }
     }
-    private SoftSkill? softSkills;
-    public SoftSkill? SoftSkills{
+
+    private SoftSkill? softSkill;
+    public SoftSkill? SoftSkill
+    {
         get
         {
-            return this.softSkills;
+            return this.softSkill;
         }
         set
         {
-            this.softSkills = value;
+            this.softSkill = value;
         }
     }
 }

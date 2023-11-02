@@ -18,6 +18,7 @@ public class User
             this.id = value;
         }
     }
+
     private string nombre = "";
     public string Nombre 
     {
@@ -30,6 +31,7 @@ public class User
             this.nombre = value;
         } 
     }
+
     private string apellido = "";
     public string Apellido 
     {
@@ -42,6 +44,7 @@ public class User
             this.apellido = value;
         } 
     }
+
     private string profesion = "";
     public string Profesion 
     {
@@ -54,6 +57,7 @@ public class User
             this.profesion = value;
         } 
     }
+
     private string gmail = "";
     public string Gmail 
     {
@@ -66,6 +70,7 @@ public class User
             this.gmail = value;
         } 
     }
+
     private string curriculum = "";
     public string Curriculum 
     {
@@ -78,6 +83,7 @@ public class User
             this.curriculum = value;
         } 
     }
+
     private string description = "";
     public string Description 
     {
@@ -90,45 +96,46 @@ public class User
             this.description = value;
         } 
     }
-    private string profile_photo = "";
-    public string Profile_photo 
+
+    private string profilePhoto = "";
+    public string ProfilePhoto 
     { 
         get
         {
-            return this.profile_photo;
+            return this.profilePhoto;
         } 
         set
         {
-            this.profile_photo = value;
+            this.profilePhoto = value;
         }
     }
     
-    
+    private List<TechnologyByUser>? technologiesByUser; //cambiar a tipo objeto
+    public List<TechnologyByUser>? TechnologiesByUser
+    {
+        get
+        {
+            return this.technologiesByUser;       
+        }
+        set
+        {
+            this.technologiesByUser = value;
+        }
+    }
 
-    private List<User_TechnicalSkill>? user_technicalSkills; //cambiar a tipo objeto
-    public List<User_TechnicalSkill>? User_TechnicalSkills 
+    private List<SoftSkillByUser>? softSkillsByUser;
+    public List<SoftSkillByUser>? SoftSkillsByUser 
     {
         get
         {
-            return this.user_technicalSkills;       
+            return this.softSkillsByUser;       
         }
         set
         {
-            this.user_technicalSkills = value;
+            this.softSkillsByUser = value;
         }
     }
-    private List<User_SoftSkill>? user_SoftSkills;
-    public List<User_SoftSkill>? User_SoftSkills 
-    {
-        get
-        {
-            return this.user_SoftSkills;       
-        }
-        set
-        {
-            this.user_SoftSkills = value;
-        }
-    }
+    
     private List<Card>? cards;
     public List<Card>? Cards 
     {
@@ -141,6 +148,7 @@ public class User
             this.cards = value;
         }
     }
+
     private List<Project>? projects;
     public List<Project>? Projects 
     {

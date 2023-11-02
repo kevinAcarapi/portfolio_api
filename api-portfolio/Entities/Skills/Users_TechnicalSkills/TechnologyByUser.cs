@@ -3,9 +3,11 @@ using api_portafolio.Entities.Skills.TechnicalSkills;
 
 namespace api_portafolio.Entities.Skills.Users_TechnicalSkills;
 
-public class User_TechnicalSkill{
+public class TechnologyByUser
+{
     private long id = 0;
-    public long Id{
+    public long Id
+    {
         get
         {
             return this.id;
@@ -15,27 +17,30 @@ public class User_TechnicalSkill{
             this.id = value;
         }
     }
-    private User? users;
-    public User? Users{
+
+    private User? user;
+    public User? User
+    {
         get
         {
-            return this.users;
+            return this.user;
         }
         set
         {
-            this.users = value;
+            this.user = value;
         }
     }
 
-    private Technology? technologys;
-    public Technology? Technologys{
+    private Technology? technology;
+    public Technology? Technology
+    {
         get
         {
-            return this.technologys;
+            return this.technology;
         }
         set
         {
-            this.technologys = value;
+            this.technology = value;
         }
     }
 }

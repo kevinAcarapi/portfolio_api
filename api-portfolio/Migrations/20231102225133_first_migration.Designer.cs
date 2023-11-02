@@ -11,8 +11,8 @@ using api_portfolio.Data.DataContext;
 namespace api_portfolio.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231102210911_relation_entities_user_project")]
-    partial class relation_entities_user_project
+    [Migration("20231102225133_first_migration")]
+    partial class first_migration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -28,6 +28,10 @@ namespace api_portfolio.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Discriminator")
                         .IsRequired()
                         .HasColumnType("longtext");
 
@@ -51,26 +55,8 @@ namespace api_portfolio.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Cards");
-                });
 
-            modelBuilder.Entity("api_portafolio.Entities.Projects.Project", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Technology_used")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<long?>("UserId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Projects");
+                    b.HasDiscriminator<string>("Discriminator").HasValue("Card");
                 });
 
             modelBuilder.Entity("api_portafolio.Entities.Skills.SoftSkills.SoftSkill", b =>
@@ -79,13 +65,13 @@ namespace api_portfolio.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
-                    b.Property<string>("Soft_skill")
+                    b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Softskills");
+                    b.ToTable("SoftSkills");
                 });
 
             modelBuilder.Entity("api_portafolio.Entities.Skills.TechnicalSkills.Technology", b =>
@@ -94,7 +80,7 @@ namespace api_portfolio.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
-                    b.Property<string>("Technical_skill")
+                    b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("longtext");
 
@@ -103,13 +89,13 @@ namespace api_portfolio.Migrations
                     b.ToTable("Technologies");
                 });
 
-            modelBuilder.Entity("api_portafolio.Entities.Skills.Users_SoftSkills.User_SoftSkill", b =>
+            modelBuilder.Entity("api_portafolio.Entities.Skills.Users_SoftSkills.SoftSkillByUser", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("SoftSkillsId")
+                    b.Property<long?>("SoftSkillId")
                         .HasColumnType("bigint");
 
                     b.Property<long?>("UsersId")
@@ -117,68 +103,53 @@ namespace api_portfolio.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SoftSkillsId");
+                    b.HasIndex("SoftSkillId");
 
                     b.HasIndex("UsersId");
 
-                    b.ToTable("Users_SoftSkills");
+                    b.ToTable("SoftSkillByUser");
                 });
 
-            modelBuilder.Entity("api_portafolio.Entities.Skills.Users_TechnicalSkills.User_TechnicalSkill", b =>
+            modelBuilder.Entity("api_portafolio.Entities.Skills.Users_TechnicalSkills.TechnologyByUser", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("TechnologysId")
+                    b.Property<long?>("TechnologyId")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("UsersId")
+                    b.Property<long?>("UserId")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TechnologysId");
+                    b.HasIndex("TechnologyId");
 
-                    b.HasIndex("UsersId");
+                    b.HasIndex("UserId");
 
-                    b.ToTable("User_TechnicalSkill");
+                    b.ToTable("TechnologiesByUser");
                 });
 
-            modelBuilder.Entity("api_portafolio.Entities.TechnologiesCatalog.Projects_technologiesCatalog.Project_technologyCatalog", b =>
+            modelBuilder.Entity("api_portafolio.Entities.TechnologiesCatalog.TechnologyByProject", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("ProjectsId")
+                    b.Property<long?>("ProjectId")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("TechnologiesCatalogId")
+                    b.Property<long>("TechnologyId")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProjectsId");
+                    b.HasIndex("ProjectId");
 
-                    b.HasIndex("TechnologiesCatalogId");
+                    b.HasIndex("TechnologyId");
 
-                    b.ToTable("Projects_TechnologiesCatalog");
-                });
-
-            modelBuilder.Entity("api_portafolio.Entities.TechnologiesCatalog.TechnologyCatalog", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Project_technology")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("technologiesCatalog");
+                    b.ToTable("TechnologiesByProject");
                 });
 
             modelBuilder.Entity("api_portafolio.Entities.Users.User", b =>
@@ -211,13 +182,25 @@ namespace api_portfolio.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("Profile_photo")
+                    b.Property<string>("ProfilePhoto")
                         .IsRequired()
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("api_portafolio.Entities.Projects.Project", b =>
+                {
+                    b.HasBaseType("api_portafolio.Entities.Cards.Card");
+
+                    b.Property<long?>("UserId1")
+                        .HasColumnType("bigint");
+
+                    b.HasIndex("UserId1");
+
+                    b.HasDiscriminator().HasValue("Project");
                 });
 
             modelBuilder.Entity("api_portafolio.Entities.Cards.Card", b =>
@@ -227,66 +210,56 @@ namespace api_portfolio.Migrations
                         .HasForeignKey("UserId");
                 });
 
+            modelBuilder.Entity("api_portafolio.Entities.Skills.Users_SoftSkills.SoftSkillByUser", b =>
+                {
+                    b.HasOne("api_portafolio.Entities.Skills.SoftSkills.SoftSkill", "SoftSkill")
+                        .WithMany()
+                        .HasForeignKey("SoftSkillId");
+
+                    b.HasOne("api_portafolio.Entities.Users.User", "Users")
+                        .WithMany("SoftSkillsByUser")
+                        .HasForeignKey("UsersId");
+
+                    b.Navigation("SoftSkill");
+
+                    b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("api_portafolio.Entities.Skills.Users_TechnicalSkills.TechnologyByUser", b =>
+                {
+                    b.HasOne("api_portafolio.Entities.Skills.TechnicalSkills.Technology", "Technology")
+                        .WithMany()
+                        .HasForeignKey("TechnologyId");
+
+                    b.HasOne("api_portafolio.Entities.Users.User", "User")
+                        .WithMany("TechnologiesByUser")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Technology");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("api_portafolio.Entities.TechnologiesCatalog.TechnologyByProject", b =>
+                {
+                    b.HasOne("api_portafolio.Entities.Projects.Project", null)
+                        .WithMany("TechnologiesByProject")
+                        .HasForeignKey("ProjectId");
+
+                    b.HasOne("api_portafolio.Entities.Skills.TechnicalSkills.Technology", "Technology")
+                        .WithMany()
+                        .HasForeignKey("TechnologyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Technology");
+                });
+
             modelBuilder.Entity("api_portafolio.Entities.Projects.Project", b =>
                 {
                     b.HasOne("api_portafolio.Entities.Users.User", null)
                         .WithMany("Projects")
-                        .HasForeignKey("UserId");
-                });
-
-            modelBuilder.Entity("api_portafolio.Entities.Skills.Users_SoftSkills.User_SoftSkill", b =>
-                {
-                    b.HasOne("api_portafolio.Entities.Skills.SoftSkills.SoftSkill", "SoftSkills")
-                        .WithMany()
-                        .HasForeignKey("SoftSkillsId");
-
-                    b.HasOne("api_portafolio.Entities.Users.User", "Users")
-                        .WithMany("User_SoftSkills")
-                        .HasForeignKey("UsersId");
-
-                    b.Navigation("SoftSkills");
-
-                    b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("api_portafolio.Entities.Skills.Users_TechnicalSkills.User_TechnicalSkill", b =>
-                {
-                    b.HasOne("api_portafolio.Entities.Skills.TechnicalSkills.Technology", "Technologys")
-                        .WithMany()
-                        .HasForeignKey("TechnologysId");
-
-                    b.HasOne("api_portafolio.Entities.Users.User", "Users")
-                        .WithMany("User_TechnicalSkills")
-                        .HasForeignKey("UsersId");
-
-                    b.Navigation("Technologys");
-
-                    b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("api_portafolio.Entities.TechnologiesCatalog.Projects_technologiesCatalog.Project_technologyCatalog", b =>
-                {
-                    b.HasOne("api_portafolio.Entities.Projects.Project", "Projects")
-                        .WithMany("Projects_TechnologiesCatalogs")
-                        .HasForeignKey("ProjectsId");
-
-                    b.HasOne("api_portafolio.Entities.TechnologiesCatalog.TechnologyCatalog", "TechnologiesCatalog")
-                        .WithMany("Projects_TechnologiesCatalogs")
-                        .HasForeignKey("TechnologiesCatalogId");
-
-                    b.Navigation("Projects");
-
-                    b.Navigation("TechnologiesCatalog");
-                });
-
-            modelBuilder.Entity("api_portafolio.Entities.Projects.Project", b =>
-                {
-                    b.Navigation("Projects_TechnologiesCatalogs");
-                });
-
-            modelBuilder.Entity("api_portafolio.Entities.TechnologiesCatalog.TechnologyCatalog", b =>
-                {
-                    b.Navigation("Projects_TechnologiesCatalogs");
+                        .HasForeignKey("UserId1");
                 });
 
             modelBuilder.Entity("api_portafolio.Entities.Users.User", b =>
@@ -295,9 +268,14 @@ namespace api_portfolio.Migrations
 
                     b.Navigation("Projects");
 
-                    b.Navigation("User_SoftSkills");
+                    b.Navigation("SoftSkillsByUser");
 
-                    b.Navigation("User_TechnicalSkills");
+                    b.Navigation("TechnologiesByUser");
+                });
+
+            modelBuilder.Entity("api_portafolio.Entities.Projects.Project", b =>
+                {
+                    b.Navigation("TechnologiesByProject");
                 });
 #pragma warning restore 612, 618
         }

@@ -14,16 +14,17 @@ public class Technology
             this.id = value;
         }
     }
-    private string technical_skill = "";
-    public string Technical_skill
+
+    private string description = "";
+    public string Description
     {
         get
         {
-            return this.technical_skill;       
+            return this.description;       
         }
         set
         {
-            this.technical_skill = value;
+            this.description = value;
         }
     }
 }

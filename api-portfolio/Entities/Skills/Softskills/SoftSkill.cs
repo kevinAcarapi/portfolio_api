@@ -15,16 +15,16 @@ public class SoftSkill
         }
     }
 
-    private string soft_skill ="";
-    public string Soft_skill
+    private string description ="";
+    public string Description
     {
         get
         {
-            return this.soft_skill;       
+            return this.description;       
         }
         set
         {
-            this.soft_skill = value;
+            this.description = value;
         }
     }
 }

@@ -18,16 +18,12 @@ public class UserController : ControllerBase
         this.dataContext = dataContext;
     }
 
-    [HttpGet("{idType}")]
-    public async Task<ActionResult<List<User>>> Get(long idType)
+    [HttpGet("{id}")]
+    public async Task<ActionResult<User>> Get(long id)
     {
-        List<User> users = new List<User>();
-
-        if (this.dataContext != null && this.dataContext.Users != null && this.dataContext.Technologies != null)
-        {
-            Technology? technology = await this.dataContext.Technologies.FindAsync(idType);
-            users = await this.dataContext.Users.Where(user => user.Id == id).ToListAsync();
-        }
-        return Ok(users);
+        User user = await this.dataContext.Users
+            .FindAsync(id);
+        
+        return Ok(user);
     }
 }
