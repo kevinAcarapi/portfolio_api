@@ -1,4 +1,4 @@
-namespace api_portafolio.Entities.TechnicalSkills;
+namespace api_portafolio.Entities.Skills.TechnicalSkills;
 
 public class Technology 
 {

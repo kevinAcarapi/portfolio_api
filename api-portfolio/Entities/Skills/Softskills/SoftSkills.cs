@@ -1,4 +1,4 @@
-namespace api_portafolio.Entities.Skills;
+namespace api_portafolio.Entities.Skills.SoftSkills;
 
 public class SoftSkill
 {
