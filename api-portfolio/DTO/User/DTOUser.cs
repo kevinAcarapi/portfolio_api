@@ -1,10 +1,10 @@
-namespace api_portafolio.Entities.Users;
+namespace api_portafolio.DTO.User;
 using api_portafolio.Entities.Projects;
 using api_portafolio.Entities.Skills.SoftSkills;
 using api_portafolio.Entities.Cards;
 using api_portafolio.Entities.Skills.TechnicalSkills;
 
-public class User
+public class UserResponseDTO
 {
     private long id = 0;
     public long Id 
@@ -109,56 +109,4 @@ public class User
             this.profilePhoto = value;
         }
     }
-    
-    private List<Technology>? technologies; //cambiar a tipo objeto
-    public List<Technology>? Technologies
-    {
-        get
-        {
-            return this.technologies;       
-        }
-        set
-        {
-            this.technologies = value;
-        }
-    }
-
-    private List<SoftSkill>? softSkills;
-    public List<SoftSkill>? SoftSkills 
-    {
-        get
-        {
-            return this.softSkills;       
-        }
-        set
-        {
-            this.softSkills = value;
-        }
-    }
-    
-    private List<Card>? cards;
-    public List<Card>? Cards 
-    {
-        get
-        {
-            return this.cards;       
-        }
-        set
-        {
-            this.cards = value;
-        }
-    }
-
-    private List<Project>? projects;
-    public List<Project>? Projects 
-    {
-        get
-        {
-            return this.projects;       
-        }
-        set
-        {
-            this.projects = value;
-        }
-    }    
 }

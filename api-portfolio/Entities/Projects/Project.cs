@@ -5,19 +5,6 @@ namespace api_portafolio.Entities.Projects;
 
 public class Project : Card
 {
-    private long id = 0;
-    public long Id
-    {
-        get
-        {
-            return this.id;
-        }
-        set
-        {
-            this.id = value;
-        }
-    }
-
     private List<TechnologyByProject>? technologiesByProject;
     public List<TechnologyByProject>? TechnologiesByProject 
     {
