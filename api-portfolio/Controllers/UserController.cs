@@ -1,9 +1,10 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-
+using api_portafolio.Entities.Skills.TechnicalSkills;
+using api_portafolio.Entities.Skills.SoftSkills;
 using api_portafolio.Entities.Users;
-
+using api_portafolio.DTO.Tecnology;
 using api_portfolio.Data.DataContext;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -44,15 +45,17 @@ public class UserController : ControllerBase
         };
 
         List<User> lista = new List<User>();
-        
+
         User user = await this.dataContext.Users
             .Where(user => user.Id == id)
             .FirstOrDefaultAsync();
 
-        if(user == null){
+        if (user == null)
+        {
             return NotFound("Usuario no encontrado");
         }
-        UserResponseDTO userResponseDTO = new UserResponseDTO{
+        UserResponseDTO userResponseDTO = new UserResponseDTO
+        {
             Id = user.Id,
             Apellido = user.Apellido,
             Nombre = user.Nombre,
@@ -62,7 +65,7 @@ public class UserController : ControllerBase
             Gmail = user.Gmail,
             Profesion = user.Profesion
         };
-        
+
         return Ok(userResponseDTO);
     }
 
@@ -80,12 +83,14 @@ public class UserController : ControllerBase
 
     [HttpPut("{id}")]
     public async Task<ActionResult<User>> Put(
-        [FromRoute]long id, 
+        [FromRoute] long id,
         [FromBody] User user)
     {
-        if (this.dataContext != null && this.dataContext.Users != null){
+        if (this.dataContext != null && this.dataContext.Users != null)
+        {
             User dbuser = await this.dataContext.Users.FindAsync(id);
-            if(dbuser == null){
+            if (dbuser == null)
+            {
                 return NotFound("Usuario no encontrado");
             }
             dbuser.Curriculum = user.Curriculum;
@@ -99,4 +104,31 @@ public class UserController : ControllerBase
 
         return Ok(user);
     }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult<User>> Delete(long id)
+    {
+        if (this.dataContext == null || this.dataContext.Users == null)
+        {
+            return StatusCode(500, "Error interno del servidor");
+        }
+
+        User dbUser = await this.dataContext.Users.FindAsync(id);
+
+        if (dbUser == null)
+        {
+            return NotFound("Usuario no encontrado");
+        }
+        var userTecnologies = this.dataContext.Technologies.Where(tecnology => tecnology.Id == id);
+        this.dataContext.Technologies.RemoveRange(userTecnologies);
+
+        var userSoftSkills = this.dataContext.SoftSkills.Where(userSoftSkills => userSoftSkills.Id == id);
+        this.dataContext.SoftSkills.RemoveRange(userSoftSkills);
+
+
+        this.dataContext.Users.Remove(dbUser);
+        await this.dataContext.SaveChangesAsync();
+        return Ok(dbUser);
+    }
+
 }
