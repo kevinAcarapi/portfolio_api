@@ -1,10 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using api_portafolio.Entities.Skills.TechnicalSkills;
-using api_portafolio.Entities.TechnologiesCatalog;
+
 using api_portafolio.Entities.Users;
-using api_portafolio.Entities.Skills.SoftSkills;
+
 using api_portfolio.Data.DataContext;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -54,15 +53,50 @@ public class UserController : ControllerBase
             return NotFound("Usuario no encontrado");
         }
         UserResponseDTO userResponseDTO = new UserResponseDTO{
+            Id = user.Id,
             Apellido = user.Apellido,
             Nombre = user.Nombre,
             Description = user.Description,
             ProfilePhoto = user.ProfilePhoto,
+            Curriculum = user.Curriculum,
+            Gmail = user.Gmail,
+            Profesion = user.Profesion
         };
         
         return Ok(userResponseDTO);
     }
 
-    // [HttpPost]
-    // public async Task<ActionResult<User>> Post([FromBody])
+    [HttpPost]
+    public async Task<ActionResult<User>> Post([FromBody] User user)
+    {
+        if (this.dataContext != null && this.dataContext.Users != null)
+        {
+            await this.dataContext.Users.AddAsync(user);
+
+            await this.dataContext.SaveChangesAsync();
+        }
+        return Ok(user);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<ActionResult<User>> Put(
+        [FromRoute]long id, 
+        [FromBody] User user)
+    {
+        if (this.dataContext != null && this.dataContext.Users != null){
+            User dbuser = await this.dataContext.Users.FindAsync(id);
+            if(dbuser == null){
+                return NotFound("Usuario no encontrado");
+            }
+            dbuser.Curriculum = user.Curriculum;
+            dbuser.Apellido = user.Apellido;
+            dbuser.Nombre = user.Nombre;
+            dbuser.Profesion = user.Profesion;
+            dbuser.ProfilePhoto = user.ProfilePhoto;
+
+            await this.dataContext.SaveChangesAsync();
+        }
+
+        return Ok(user);
+    }
 }
