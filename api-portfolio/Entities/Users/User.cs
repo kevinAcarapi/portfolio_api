@@ -2,11 +2,12 @@ namespace api_portafolio.Entities.Users;
 using api_portafolio.Entities.Projects;
 using api_portafolio.Entities.Skills.SoftSkills;
 using api_portafolio.Entities.Cards;
+using api_portafolio.Entities.Blogs;
 using api_portafolio.Entities.Skills.TechnicalSkills;
 
 public class User
 {
-    private long id = 0;
+    private long id;
     public long Id 
     {
         get
@@ -136,16 +137,16 @@ public class User
         }
     }
     
-    private List<Card>? cards;
-    public List<Card>? Cards 
+    private List<Blog>? blogs;
+    public List<Blog>? Blogs 
     {
         get
         {
-            return this.cards;       
+            return this.blogs;       
         }
         set
         {
-            this.cards = value;
+            this.blogs = value;
         }
     }
 

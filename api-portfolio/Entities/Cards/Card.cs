@@ -2,7 +2,7 @@ namespace api_portafolio.Entities.Cards;
 
 public class Card 
 {
-    private long id = 0;
+    private long id;
     public long Id 
     { 
         get
