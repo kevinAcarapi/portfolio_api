@@ -1,9 +1,9 @@
-namespace api_portafolio.DTO.User;
 using api_portafolio.Entities.Projects;
 using api_portafolio.Entities.Skills.SoftSkills;
-using api_portafolio.Entities.Cards;
+using Microsoft.AspNetCore.Http;
 using api_portafolio.Entities.Skills.TechnicalSkills;
 
+namespace api_portafolio.DTO.User;
 public class UserResponseDTO
 {
     private long id = 0;
@@ -97,8 +97,8 @@ public class UserResponseDTO
         } 
     }
 
-    private string profilePhoto = "";
-    public string ProfilePhoto 
+    private IFormFile? profilePhoto;
+    public IFormFile ProfilePhoto 
     { 
         get
         {

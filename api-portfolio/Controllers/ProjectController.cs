@@ -65,29 +65,29 @@ public class ProjectController : ControllerBase
         return Ok(project);
     }
 
-    [HttpPut("{id}")]
-    public async Task<ActionResult<Project>> Put(
-        [FromRoute] long id,
-        [FromBody] Project project)
-    {
-        if (this.dataContext != null && this.dataContext.Projects != null)
-        {
-            User user =await this.dataContext.Users
-            .Include(user => user.Projects)
-            .ThenInclude(project => project.TechnologiesByProject)
-            .ThenInclude(technologyByProject => technologyByProject.Technology)
-            .Where(user => user.Id == id)
-            .FirstOrDefaultAsync();
+    // [HttpPut("{id}")]
+    // public async Task<ActionResult<Project>> Put(
+    //     [FromRoute] long id,
+    //     [FromBody] Project project)
+    // {
+    //     if (this.dataContext != null && this.dataContext.Projects != null)
+    //     {
+    //         User user =await this.dataContext.Users
+    //         .Include(user => user.Projects)
+    //         .ThenInclude(project => project.TechnologiesByProject)
+    //         .ThenInclude(technologyByProject => technologyByProject.Technology)
+    //         .Where(user => user.Id == id)
+    //         .FirstOrDefaultAsync();
 
-            if(user == null){
-                return NotFound("Usuario no encontrado")
-            }
+    //         if(user == null){
+    //             return NotFound("Usuario no encontrado")
+    //         }
 
-             Project proj = user.Projects.FirstOrDefault(proj => p.Id == project.Id);
+    //         Project proj = user.Projects.FirstOrDefault(proj => p.Id == project.Id);
 
-            await this.dataContext.SaveChangesAsync();
-        }
+    //         await this.dataContext.SaveChangesAsync();
+    //     }
 
-        return Ok(project);
-    }
+    //     return Ok(project);
+    // }
 }

@@ -5,39 +5,11 @@ using MySql.EntityFrameworkCore.Metadata;
 
 namespace api_portfolio.Migrations
 {
-    public partial class first_migration : Migration
+    public partial class initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterDatabase()
-                .Annotation("MySQL:Charset", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "SoftSkills",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    Description = table.Column<string>(type: "longtext", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SoftSkills", x => x.Id);
-                })
-                .Annotation("MySQL:Charset", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "Technologies",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    Description = table.Column<string>(type: "longtext", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Technologies", x => x.Id);
-                })
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
@@ -61,7 +33,7 @@ namespace api_portfolio.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Cards",
+                name: "Blogs",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
@@ -70,70 +42,76 @@ namespace api_portfolio.Migrations
                     Title = table.Column<string>(type: "longtext", nullable: false),
                     Description = table.Column<string>(type: "longtext", nullable: false),
                     Enlace = table.Column<string>(type: "longtext", nullable: false),
-                    Discriminator = table.Column<string>(type: "longtext", nullable: false),
-                    UserId = table.Column<long>(type: "bigint", nullable: true),
-                    UserId1 = table.Column<long>(type: "bigint", nullable: true)
+                    UserId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Cards", x => x.Id);
+                    table.PrimaryKey("PK_Blogs", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Cards_Users_UserId",
+                        name: "FK_Blogs_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id");
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Projects",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    Imagen = table.Column<string>(type: "longtext", nullable: false),
+                    Title = table.Column<string>(type: "longtext", nullable: false),
+                    Description = table.Column<string>(type: "longtext", nullable: false),
+                    Enlace = table.Column<string>(type: "longtext", nullable: false),
+                    UserId = table.Column<long>(type: "bigint", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Projects", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Cards_Users_UserId1",
-                        column: x => x.UserId1,
+                        name: "FK_Projects_Users_UserId",
+                        column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id");
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "SoftSkillByUser",
+                name: "SoftSkills",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    UsersId = table.Column<long>(type: "bigint", nullable: true),
-                    SoftSkillId = table.Column<long>(type: "bigint", nullable: true)
+                    Description = table.Column<string>(type: "longtext", nullable: false),
+                    UserId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SoftSkillByUser", x => x.Id);
+                    table.PrimaryKey("PK_SoftSkills", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_SoftSkillByUser_SoftSkills_SoftSkillId",
-                        column: x => x.SoftSkillId,
-                        principalTable: "SoftSkills",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_SoftSkillByUser_Users_UsersId",
-                        column: x => x.UsersId,
+                        name: "FK_SoftSkills_Users_UserId",
+                        column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id");
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "TechnologiesByUser",
+                name: "Technologies",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    UserId = table.Column<long>(type: "bigint", nullable: true),
-                    TechnologyId = table.Column<long>(type: "bigint", nullable: true)
+                    Description = table.Column<string>(type: "longtext", nullable: false),
+                    UserId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TechnologiesByUser", x => x.Id);
+                    table.PrimaryKey("PK_Technologies", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_TechnologiesByUser_Technologies_TechnologyId",
-                        column: x => x.TechnologyId,
-                        principalTable: "Technologies",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_TechnologiesByUser_Users_UserId",
+                        name: "FK_Technologies_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id");
@@ -153,9 +131,9 @@ namespace api_portfolio.Migrations
                 {
                     table.PrimaryKey("PK_TechnologiesByProject", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_TechnologiesByProject_Cards_ProjectId",
+                        name: "FK_TechnologiesByProject_Projects_ProjectId",
                         column: x => x.ProjectId,
-                        principalTable: "Cards",
+                        principalTable: "Projects",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_TechnologiesByProject_Technologies_TechnologyId",
@@ -167,24 +145,24 @@ namespace api_portfolio.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Cards_UserId",
-                table: "Cards",
+                name: "IX_Blogs_UserId",
+                table: "Blogs",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Cards_UserId1",
-                table: "Cards",
-                column: "UserId1");
+                name: "IX_Projects_UserId",
+                table: "Projects",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SoftSkillByUser_SoftSkillId",
-                table: "SoftSkillByUser",
-                column: "SoftSkillId");
+                name: "IX_SoftSkills_UserId",
+                table: "SoftSkills",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SoftSkillByUser_UsersId",
-                table: "SoftSkillByUser",
-                column: "UsersId");
+                name: "IX_Technologies_UserId",
+                table: "Technologies",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TechnologiesByProject_ProjectId",
@@ -195,34 +173,21 @@ namespace api_portfolio.Migrations
                 name: "IX_TechnologiesByProject_TechnologyId",
                 table: "TechnologiesByProject",
                 column: "TechnologyId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_TechnologiesByUser_TechnologyId",
-                table: "TechnologiesByUser",
-                column: "TechnologyId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_TechnologiesByUser_UserId",
-                table: "TechnologiesByUser",
-                column: "UserId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "SoftSkillByUser");
-
-            migrationBuilder.DropTable(
-                name: "TechnologiesByProject");
-
-            migrationBuilder.DropTable(
-                name: "TechnologiesByUser");
+                name: "Blogs");
 
             migrationBuilder.DropTable(
                 name: "SoftSkills");
 
             migrationBuilder.DropTable(
-                name: "Cards");
+                name: "TechnologiesByProject");
+
+            migrationBuilder.DropTable(
+                name: "Projects");
 
             migrationBuilder.DropTable(
                 name: "Technologies");

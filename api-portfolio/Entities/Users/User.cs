@@ -1,7 +1,7 @@
 namespace api_portafolio.Entities.Users;
 using api_portafolio.Entities.Projects;
 using api_portafolio.Entities.Skills.SoftSkills;
-using api_portafolio.Entities.Cards;
+
 using api_portafolio.Entities.Blogs;
 using api_portafolio.Entities.Skills.TechnicalSkills;
 
@@ -98,8 +98,8 @@ public class User
         } 
     }
 
-    private string profilePhoto = "";
-    public string ProfilePhoto 
+    private IFormFile profilePhoto;
+    public IFormFile ProfilePhoto 
     { 
         get
         {

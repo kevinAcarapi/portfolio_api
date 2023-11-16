@@ -19,17 +19,13 @@ namespace api_portfolio.Migrations
                 .HasAnnotation("ProductVersion", "6.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("api_portafolio.Entities.Cards.Card", b =>
+            modelBuilder.Entity("api_portafolio.Entities.Blogs.Blog", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Discriminator")
                         .IsRequired()
                         .HasColumnType("longtext");
 
@@ -45,11 +41,46 @@ namespace api_portfolio.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<long?>("UserId")
+                        .HasColumnType("bigint");
+
                     b.HasKey("Id");
 
-                    b.ToTable("Cards");
+                    b.HasIndex("UserId");
 
-                    b.HasDiscriminator<string>("Discriminator").HasValue("Card");
+                    b.ToTable("Blogs");
+                });
+
+            modelBuilder.Entity("api_portafolio.Entities.Projects.Project", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Enlace")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Imagen")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<long?>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Projects");
                 });
 
             modelBuilder.Entity("api_portafolio.Entities.Skills.SoftSkills.SoftSkill", b =>
@@ -154,27 +185,16 @@ namespace api_portfolio.Migrations
 
             modelBuilder.Entity("api_portafolio.Entities.Blogs.Blog", b =>
                 {
-                    b.HasBaseType("api_portafolio.Entities.Cards.Card");
-
-                    b.Property<long?>("UserId")
-                        .HasColumnType("bigint");
-
-                    b.HasIndex("UserId");
-
-                    b.HasDiscriminator().HasValue("Blog");
+                    b.HasOne("api_portafolio.Entities.Users.User", null)
+                        .WithMany("Blogs")
+                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("api_portafolio.Entities.Projects.Project", b =>
                 {
-                    b.HasBaseType("api_portafolio.Entities.Cards.Card");
-
-                    b.Property<long?>("UserId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("Project_UserId");
-
-                    b.HasIndex("UserId");
-
-                    b.HasDiscriminator().HasValue("Project");
+                    b.HasOne("api_portafolio.Entities.Users.User", null)
+                        .WithMany("Projects")
+                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("api_portafolio.Entities.Skills.SoftSkills.SoftSkill", b =>
@@ -206,18 +226,9 @@ namespace api_portfolio.Migrations
                     b.Navigation("Technology");
                 });
 
-            modelBuilder.Entity("api_portafolio.Entities.Blogs.Blog", b =>
-                {
-                    b.HasOne("api_portafolio.Entities.Users.User", null)
-                        .WithMany("Blogs")
-                        .HasForeignKey("UserId");
-                });
-
             modelBuilder.Entity("api_portafolio.Entities.Projects.Project", b =>
                 {
-                    b.HasOne("api_portafolio.Entities.Users.User", null)
-                        .WithMany("Projects")
-                        .HasForeignKey("UserId");
+                    b.Navigation("TechnologiesByProject");
                 });
 
             modelBuilder.Entity("api_portafolio.Entities.Users.User", b =>
@@ -229,11 +240,6 @@ namespace api_portfolio.Migrations
                     b.Navigation("SoftSkills");
 
                     b.Navigation("Technologies");
-                });
-
-            modelBuilder.Entity("api_portafolio.Entities.Projects.Project", b =>
-                {
-                    b.Navigation("TechnologiesByProject");
                 });
 #pragma warning restore 612, 618
         }

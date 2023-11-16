@@ -36,6 +36,8 @@ public class UserController : ControllerBase
     //     return Ok(dbUser);
     // }
 
+    //Metodo Get
+
     [HttpGet("{id}")]
     public async Task<ActionResult<User>> Get(long id)
     {
@@ -69,22 +71,34 @@ public class UserController : ControllerBase
         return Ok(userResponseDTO);
     }
 
+    // Metodo Post
     [HttpPost]
-    public async Task<ActionResult<User>> Post([FromBody] User user)
+    public async Task<ActionResult<User>> Post([FromForm] UserResponseDTO userResponseDTO)
     {
-        if (this.dataContext != null && this.dataContext.Users != null)
+        if(userResponseDTO.ProfilePhoto == null)
         {
-            await this.dataContext.Users.AddAsync(user);
+            return BadRequest("Archivo no encontrado");
+        };
 
-            await this.dataContext.SaveChangesAsync();
-        }
-        return Ok(user);
+        string path = Path.Combine(Directory.GetCurrentDirectory(), "Archivos\\profilePhotos", userResponseDTO.ProfilePhoto.FileName);
+
+        using(var stream = new FileStream(path, FileMode.Create))
+        {
+            await userResponseDTO.ProfilePhoto.CopyToAsync(stream);
+        };
+
+        User user = new User
+        (
+            
+        );
+        return Ok();
     }
 
+    // Metodo Put
     [HttpPut("{id}")]
     public async Task<ActionResult<User>> Put(
         [FromRoute] long id,
-        [FromBody] User user)
+        [FromForm] User user)
     {
         if (this.dataContext != null && this.dataContext.Users != null)
         {
@@ -98,7 +112,9 @@ public class UserController : ControllerBase
             dbuser.Nombre = user.Nombre;
             dbuser.Profesion = user.Profesion;
             dbuser.ProfilePhoto = user.ProfilePhoto;
-
+            dbuser.Description = user.Description;
+            dbuser.Gmail = user.Gmail;
+            
             await this.dataContext.SaveChangesAsync();
         }
 
