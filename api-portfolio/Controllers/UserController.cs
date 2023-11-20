@@ -62,7 +62,6 @@ public class UserController : ControllerBase
             Apellido = user.Apellido,
             Nombre = user.Nombre,
             Description = user.Description,
-            ProfilePhoto = user.ProfilePhoto,
             Curriculum = user.Curriculum,
             Gmail = user.Gmail,
             Profesion = user.Profesion
@@ -75,16 +74,16 @@ public class UserController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<User>> Post([FromForm] UserResponseDTO userResponseDTO)
     {
-        if(userResponseDTO.ProfilePhoto == null)
+        if(userResponseDTO.File == null)
         {
             return BadRequest("Archivo no encontrado");
         };
 
-        string path = Path.Combine(Directory.GetCurrentDirectory(), "Archivos\\profilePhotos", userResponseDTO.ProfilePhoto.FileName);
+        var path = Path.Combine(Directory.GetCurrentDirectory(), "Archivos", userResponseDTO.File.FileName);
 
         using(var stream = new FileStream(path, FileMode.Create))
         {
-            await userResponseDTO.ProfilePhoto.CopyToAsync(stream);
+            await userResponseDTO.File.CopyToAsync(stream);
         };
 
         User user = new User{
@@ -95,9 +94,18 @@ public class UserController : ControllerBase
             Curriculum = userResponseDTO.Curriculum,
             Gmail = userResponseDTO.Gmail,
             Profesion = userResponseDTO.Profesion,
-            ProfilePhoto = userResponseDTO.ProfilePhoto,
-            UrlImage = path
+            Image = new api_portafolio.Entities.Common.Image 
+            {
+                Path = path,
+                UploadDate = DateTime.Now,
+                Url = ""
+            },
         };
+
+        await this.dataContext.Users.AddAsync(user);
+
+        await this.dataContext.SaveChangesAsync();
+
         return Ok();
     }
 
@@ -114,11 +122,12 @@ public class UserController : ControllerBase
             {
                 return NotFound("Usuario no encontrado");
             }
+            
             dbuser.Curriculum = user.Curriculum;
             dbuser.Apellido = user.Apellido;
             dbuser.Nombre = user.Nombre;
             dbuser.Profesion = user.Profesion;
-            dbuser.ProfilePhoto = user.ProfilePhoto;
+            dbuser.Image = user.Image;
             dbuser.Description = user.Description;
             dbuser.Gmail = user.Gmail;
             
