@@ -97,17 +97,17 @@ public class UserResponseDTO
         } 
     }
 
-    private IFormFile? profilePhoto;
-    public IFormFile? ProfilePhoto 
+    private IFormFile? file;
+    public IFormFile? File 
     { 
         get
         {
-            return this.profilePhoto;
+            return this.file;
         } 
         set
         {
-            this.profilePhoto = value;
+            this.file = value;
         }
     }
-    public string UrlImage {get; set;}
+
 }

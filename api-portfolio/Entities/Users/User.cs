@@ -4,6 +4,7 @@ using api_portafolio.Entities.Skills.SoftSkills;
 
 using api_portafolio.Entities.Blogs;
 using api_portafolio.Entities.Skills.TechnicalSkills;
+using api_portafolio.Entities.Common;
 
 public class User
 {
@@ -98,29 +99,16 @@ public class User
         } 
     }
 
-    private IFormFile profilePhoto;
-    public IFormFile ProfilePhoto 
-    { 
-        get
-        {
-            return this.profilePhoto;
-        } 
-        set
-        {
-            this.profilePhoto = value;
-        }
-    }
-
-    private string urlImage = "";
-    public string UrlImage
+    private Image? image;
+    public Image? Image
     {
         get
         {
-            return this.urlImage;
+            return this.image;
         }
         set
         {
-            this.urlImage = value;
+            this.image = value;
         }
     }
     
