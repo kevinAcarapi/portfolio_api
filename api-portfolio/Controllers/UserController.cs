@@ -87,10 +87,17 @@ public class UserController : ControllerBase
             await userResponseDTO.ProfilePhoto.CopyToAsync(stream);
         };
 
-        User user = new User
-        (
-            
-        );
+        User user = new User{
+            Id = userResponseDTO.Id,
+            Apellido = userResponseDTO.Apellido,
+            Nombre = userResponseDTO.Nombre,
+            Description = userResponseDTO.Description,
+            Curriculum = userResponseDTO.Curriculum,
+            Gmail = userResponseDTO.Gmail,
+            Profesion = userResponseDTO.Profesion,
+            ProfilePhoto = userResponseDTO.ProfilePhoto,
+            UrlImage = path
+        };
         return Ok();
     }
 

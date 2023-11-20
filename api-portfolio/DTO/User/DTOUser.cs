@@ -98,7 +98,7 @@ public class UserResponseDTO
     }
 
     private IFormFile? profilePhoto;
-    public IFormFile ProfilePhoto 
+    public IFormFile? ProfilePhoto 
     { 
         get
         {
@@ -109,4 +109,5 @@ public class UserResponseDTO
             this.profilePhoto = value;
         }
     }
+    public string UrlImage {get; set;}
 }

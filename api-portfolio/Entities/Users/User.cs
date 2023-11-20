@@ -110,6 +110,19 @@ public class User
             this.profilePhoto = value;
         }
     }
+
+    private string urlImage = "";
+    public string UrlImage
+    {
+        get
+        {
+            return this.urlImage;
+        }
+        set
+        {
+            this.urlImage = value;
+        }
+    }
     
     private List<Technology>? technologies; //cambiar a tipo objeto
     public List<Technology>? Technologies
