@@ -45,7 +45,7 @@ public class ProjectController : ControllerBase
             } 
             projectResponseDTOs.Add(new ProjectResponseDTO{
                 Id = project.Id,
-                Imagen = project.Imagen,
+                // Imagen = project.Imagen,
                 Description = project.Description,
                 Technologies = technologyDTOResponses
             });
@@ -54,40 +54,51 @@ public class ProjectController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<Project>> Post([FromBody] Project project)
+    public async Task<ActionResult<User>> Post([FromForm] ProjectResponseDTO projectResponseDTO)
+    {
+        if(projectResponseDTO.Imagen == null)
+        {
+            return BadRequest("Archivo no encontrado");
+        };
+
+        string path = Path.Combine(Directory.GetCurrentDirectory(), "Archivos\\projectPhotos", projectResponseDTO.Imagen.FileName);
+
+        using(var stream = new FileStream(path, FileMode.Create))
+        {
+            await projectResponseDTO.Imagen.CopyToAsync(stream);
+        };
+
+        Project project = new Project{
+            Id = projectResponseDTO.Id,
+            Description = projectResponseDTO.Description,
+            Enlace = projectResponseDTO.Enlace,
+            // Imagen = projectResponseDTO.Imagen,
+            Title = projectResponseDTO.Title,
+        };
+        return Ok();
+    }
+
+    [HttpPut("{id}")]
+    public async Task<ActionResult<Project>> Put(
+        [FromRoute] long id,
+        [FromForm] Project project)
     {
         if (this.dataContext != null && this.dataContext.Projects != null)
         {
-            await this.dataContext.Projects.AddAsync(project);
+            Project dbproject = await this.dataContext.Projects.FindAsync(id);
+            if(dbproject == null){
+                return NotFound("Usuario no encontrado");
+            };
+
+            dbproject.Id = project.Id;
+            dbproject.Description = project.Description;
+            dbproject.Enlace = project.Enlace;
+            // dbproject.Imagen = project.Imagen;
+            dbproject.Title = project.Title;
 
             await this.dataContext.SaveChangesAsync();
         }
+
         return Ok(project);
     }
-
-    // [HttpPut("{id}")]
-    // public async Task<ActionResult<Project>> Put(
-    //     [FromRoute] long id,
-    //     [FromBody] Project project)
-    // {
-    //     if (this.dataContext != null && this.dataContext.Projects != null)
-    //     {
-    //         User user =await this.dataContext.Users
-    //         .Include(user => user.Projects)
-    //         .ThenInclude(project => project.TechnologiesByProject)
-    //         .ThenInclude(technologyByProject => technologyByProject.Technology)
-    //         .Where(user => user.Id == id)
-    //         .FirstOrDefaultAsync();
-
-    //         if(user == null){
-    //             return NotFound("Usuario no encontrado")
-    //         }
-
-    //         Project proj = user.Projects.FirstOrDefault(proj => p.Id == project.Id);
-
-    //         await this.dataContext.SaveChangesAsync();
-    //     }
-
-    //     return Ok(project);
-    // }
 }

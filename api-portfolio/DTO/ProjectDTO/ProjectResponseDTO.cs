@@ -16,8 +16,8 @@ public class ProjectResponseDTO
             this.id = value;
         }
     }
-    private string imagen = "";
-    public string Imagen 
+    private FormFile? imagen;
+    public FormFile? Imagen 
     {
         get 
         {
