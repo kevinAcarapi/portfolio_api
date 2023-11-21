@@ -72,18 +72,18 @@ public class UserController : ControllerBase
 
     // Metodo Post
     [HttpPost]
-    public async Task<ActionResult<User>> Post([FromForm] UserResponseDTO userResponseDTO)
+    public async Task<ActionResult> Post([FromForm] UserResponseDTO userResponseDTO)
     {
-        if(userResponseDTO.File == null)
+        if(userResponseDTO.Image == null)
         {
             return BadRequest("Archivo no encontrado");
         };
 
-        var path = Path.Combine(Directory.GetCurrentDirectory(), "Archivos", userResponseDTO.File.FileName);
+        var path = Path.Combine(Directory.GetCurrentDirectory(), "Archivos", "profilePhotos", userResponseDTO.Image.FileName);
 
         using(var stream = new FileStream(path, FileMode.Create))
         {
-            await userResponseDTO.File.CopyToAsync(stream);
+            await userResponseDTO.Image.CopyToAsync(stream);
         };
 
         User user = new User{
@@ -111,52 +111,71 @@ public class UserController : ControllerBase
 
     // Metodo Put
     [HttpPut("{id}")]
-    public async Task<ActionResult<User>> Put(
+    public async Task<ActionResult<UserResponseDTO>> Put(
         [FromRoute] long id,
-        [FromForm] User user)
+        [FromForm] UserResponseDTO userResponseDTO)
     {
-        if (this.dataContext != null && this.dataContext.Users != null)
+        User? dbUser = await this.dataContext.Users.FindAsync(id);
+        if(dbUser == null)
         {
-            User dbuser = await this.dataContext.Users.FindAsync(id);
-            if (dbuser == null)
-            {
-                return NotFound("Usuario no encontrado");
-            }
-            
-            dbuser.Curriculum = user.Curriculum;
-            dbuser.Apellido = user.Apellido;
-            dbuser.Nombre = user.Nombre;
-            dbuser.Profesion = user.Profesion;
-            dbuser.Image = user.Image;
-            dbuser.Description = user.Description;
-            dbuser.Gmail = user.Gmail;
-            
-            await this.dataContext.SaveChangesAsync();
+            return NotFound("Usuario no encontrado");
         }
+        
+        dbUser.Nombre = userResponseDTO.Nombre;
+        dbUser.Apellido = userResponseDTO.Apellido;
+        dbUser.Curriculum = userResponseDTO.Curriculum;
+        dbUser.Profesion = userResponseDTO.Profesion;
+        dbUser.Description = userResponseDTO.Description;
+        dbUser.Gmail = userResponseDTO.Gmail;
 
-        return Ok(user);
-    }
+        var path = Path.Combine(Directory.GetCurrentDirectory(), "Archivos", "profilePhotos", userResponseDTO.Image.FileName);
+
+        using(var stream = new FileStream(path, FileMode.Create))
+        {
+            await userResponseDTO.Image.CopyToAsync(stream);
+        };
+
+        dbUser.Image = new api_portafolio.Entities.Common.Image 
+            {
+                Path = path,
+                UploadDate = DateTime.Now,
+                Url = ""
+            };
+
+        await this.dataContext.SaveChangesAsync();
+
+        return Ok(dbUser);
+    }   
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult<User>> Delete(long id)
+    public async Task<ActionResult> Delete(long id)
     {
         if (this.dataContext == null || this.dataContext.Users == null)
         {
             return StatusCode(500, "Error interno del servidor");
         }
 
-        User dbUser = await this.dataContext.Users.FindAsync(id);
+        User dbUser = await this.dataContext.Users
+            .Include(user => user.Image)
+            .Include(user => user.Projects)
+            .Include(user => user.SoftSkills)
+            .Include(user => user.Technologies)
+            .Include(user => user.Blogs)
+            .Where(user => user.Id == id).FirstOrDefaultAsync();
 
         if (dbUser == null)
         {
             return NotFound("Usuario no encontrado");
         }
-        var userTecnologies = this.dataContext.Technologies.Where(tecnology => tecnology.Id == id);
-        this.dataContext.Technologies.RemoveRange(userTecnologies);
-
-        var userSoftSkills = this.dataContext.SoftSkills.Where(userSoftSkills => userSoftSkills.Id == id);
-        this.dataContext.SoftSkills.RemoveRange(userSoftSkills);
-
+        if (dbUser.Image != null){
+            this.dataContext.Images.RemoveRange(dbUser.Image);
+        }
+        
+        this.dataContext.Projects.RemoveRange(dbUser.Projects);
+        
+        this.dataContext.Technologies.RemoveRange(dbUser.Technologies);
+        this.dataContext.SoftSkills.RemoveRange(dbUser.SoftSkills);
+        this.dataContext.Blogs.RemoveRange(dbUser.Blogs);
 
         this.dataContext.Users.Remove(dbUser);
         await this.dataContext.SaveChangesAsync();

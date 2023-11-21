@@ -1,8 +1,3 @@
-using api_portafolio.Entities.Projects;
-using api_portafolio.Entities.Skills.SoftSkills;
-using Microsoft.AspNetCore.Http;
-using api_portafolio.Entities.Skills.TechnicalSkills;
-
 namespace api_portafolio.DTO.User;
 public class UserResponseDTO
 {
@@ -97,16 +92,16 @@ public class UserResponseDTO
         } 
     }
 
-    private IFormFile? file;
-    public IFormFile? File 
+    private IFormFile? image;
+    public IFormFile? Image 
     { 
         get
         {
-            return this.file;
+            return this.image;
         } 
         set
         {
-            this.file = value;
+            this.image = value;
         }
     }
 
