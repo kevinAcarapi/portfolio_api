@@ -9,6 +9,8 @@ using api_portfolio.Data.DataContext;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using api_portafolio.DTO.User;
+using api_portafolio.Entities.Projects;
+using api_portafolio.DTO.ProjectDTO;
 
 namespace api_portfolio.Controllers;
 
@@ -64,7 +66,7 @@ public class UserController : ControllerBase
             Description = user.Description,
             Curriculum = user.Curriculum,
             Gmail = user.Gmail,
-            Profesion = user.Profesion
+            Profesion = user.Profesion,
         };
 
         return Ok(userResponseDTO);
@@ -85,6 +87,11 @@ public class UserController : ControllerBase
         {
             await userResponseDTO.Image.CopyToAsync(stream);
         };
+        
+        Project? project = 
+            await this.dataContext
+                .Projects
+                .FindAsync(userResponseDTO.IdProject);
 
         User user = new User{
             Id = userResponseDTO.Id,
@@ -100,6 +107,7 @@ public class UserController : ControllerBase
                 UploadDate = DateTime.Now,
                 Url = ""
             },
+            
         };
 
         await this.dataContext.Users.AddAsync(user);

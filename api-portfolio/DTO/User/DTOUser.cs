@@ -1,3 +1,5 @@
+using api_portafolio.DTO.ProjectDTO;
+
 namespace api_portafolio.DTO.User;
 public class UserResponseDTO
 {
@@ -104,5 +106,5 @@ public class UserResponseDTO
             this.image = value;
         }
     }
-
+    public long? IdProject {get;set;}
 }

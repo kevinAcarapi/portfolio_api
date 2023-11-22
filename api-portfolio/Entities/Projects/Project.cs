@@ -1,4 +1,5 @@
 using api_portafolio.Entities.TechnologiesCatalog;
+using api_portafolio.Entities.Common;
 
 namespace api_portafolio.Entities.Projects;
 
@@ -16,17 +17,17 @@ public class Project
             this.id = value;
         }
     }
-    private string imagen = "";
-    public string Imagen 
+    private Image? image;
+    public Image? Image
     {
-        get 
+        get
         {
-            return this.imagen;
+            return this.image;
         }
         set
         {
-            this.imagen = value;
-        } 
+            this.image = value;
+        }
     }
     private string title = "";
     public string Title 

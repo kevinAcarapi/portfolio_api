@@ -5,6 +5,7 @@ using api_portafolio.Entities.Skills.SoftSkills;
 using api_portafolio.Entities.Blogs;
 using api_portafolio.Entities.Skills.TechnicalSkills;
 using api_portafolio.Entities.Common;
+using System;
 
 public class User
 {

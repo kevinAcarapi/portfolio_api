@@ -5,9 +5,10 @@ using Microsoft.EntityFrameworkCore;
 using api_portafolio.Entities.Projects;
 using System.Diagnostics.CodeAnalysis;
 using api_portafolio.DTO.ProjectDTO;
-using api_portafolio.Entities.Skills.TechnicalSkills;
 using api_portafolio.Entities.TechnologiesCatalog;
 using api_portafolio.DTO.Tecnology;
+using api_portafolio.Entities.Common;
+using api_portafolio.DTO.Common;
 namespace api_portfolio.Controllers;
 
 [ApiController]
@@ -23,14 +24,19 @@ public class ProjectController : ControllerBase
     }
 
     [HttpGet("user/{id}")]
-    public async Task<ActionResult<List<ProjectResponseDTO>>> GetProjectsByUser(long id)
+    public async Task<ActionResult<List<Project>>> GetProjectsByUser(long id)
     {
-        User user =await this.dataContext.Users
+        User? user =await this.dataContext.Users
             .Include(user => user.Projects)
             .ThenInclude(project => project.TechnologiesByProject)
             .ThenInclude(technologyByProject => technologyByProject.Technology)
             .Where(user => user.Id == id)
             .FirstOrDefaultAsync();
+
+        if (user == null)
+        {
+            return NotFound("Usuario no encontrado");
+        }
 
         List<ProjectResponseDTO> projectResponseDTOs = new List<ProjectResponseDTO>();
 
@@ -42,19 +48,20 @@ public class ProjectController : ControllerBase
                     Id = technologyByProject.Technology.Id,
                     Description = technologyByProject.Technology.Description
                 });
-            } 
+            }
+
             projectResponseDTOs.Add(new ProjectResponseDTO{
                 Id = project.Id,
-                // Imagen = project.Imagen,
+                Title = project.Title,
                 Description = project.Description,
-                Technologies = technologyDTOResponses
+                Enlace = project.Enlace
             });
         }
         return Ok(projectResponseDTOs);
     }
 
     [HttpPost]
-    public async Task<ActionResult<User>> Post([FromForm] ProjectResponseDTO projectResponseDTO)
+    public async Task<ActionResult<Project>> Post([FromForm] ProjectResponseDTO projectResponseDTO)
     {
         if(projectResponseDTO.Imagen == null)
         {
@@ -72,7 +79,12 @@ public class ProjectController : ControllerBase
             Id = projectResponseDTO.Id,
             Description = projectResponseDTO.Description,
             Enlace = projectResponseDTO.Enlace,
-            // Imagen = projectResponseDTO.Imagen,
+            Image = new api_portafolio.Entities.Common.Image 
+            {
+                Path = path,
+                UploadDate = DateTime.Now,
+                Url = ""
+            },
             Title = projectResponseDTO.Title,
         };
         return Ok();
