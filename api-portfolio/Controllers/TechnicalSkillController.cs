@@ -37,4 +37,53 @@ public class TecnologyController : ControllerBase
         }
         return Ok(technologyDTOResponses);
     }
+
+    [HttpPost]
+    public async Task<ActionResult> Post([FromForm] TechnologyDTOResponse technologyDTOResponse)
+    {
+        Technology technology = new Technology
+        {
+            Id = technologyDTOResponse.Id,
+            Description = technologyDTOResponse.Description
+        };
+
+        await this.dataContext.Technologies.AddAsync(technology);
+        await this.dataContext.SaveChangesAsync();
+
+        return Ok();
+    }
+
+    [HttpPut("{id}")]
+    public async Task<ActionResult<TechnologyDTOResponse>> Put(
+        [FromRoute] long id,
+        [FromForm] TechnologyDTOResponse technologyDTOResponse)
+    {
+        Technology? dbTechnology = await this.dataContext.Technologies.FindAsync(id);
+        if (dbTechnology == null)
+        {
+            return NotFound("Tecnología no encontrada");
+        }
+
+        dbTechnology.Id = technologyDTOResponse.Id;
+        dbTechnology.Description = technologyDTOResponse.Description;
+
+        await this.dataContext.SaveChangesAsync();
+
+        return Ok(dbTechnology);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> Delete(long id)
+    {
+        Technology? dbTechnology = await this.dataContext.Technologies.FindAsync(id);
+        if (dbTechnology == null)
+        {
+            return NotFound("Tecnología no encontrada");
+        }
+
+        this.dataContext.Technologies.Remove(dbTechnology);
+        await this.dataContext.SaveChangesAsync();
+
+        return Ok();
+    }        
 }
