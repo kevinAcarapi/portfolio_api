@@ -27,20 +27,6 @@ public class UserController : ControllerBase
         this.dataContext = dataContext;
     }
 
-    // [HttpGet("{id}")]
-    // public async Task<ActionResult<User>> GetUser(long id)
-    // {
-    //     User? dbUser = await this.dataContext.Users.Include(dbUser => dbUser.TechnologiesByUser).ToListAsync(id);
-    //     if(dbUser == null)
-    //     {
-    //         return NotFound("Usuario no encontrado");
-    //     }
-
-    //     return Ok(dbUser);
-    // }
-
-    //Metodo Get
-
     [HttpGet("{id}")]
     public async Task<ActionResult<User>> Get(long id)
     {
@@ -171,23 +157,66 @@ public class UserController : ControllerBase
         dbUser.Description = userResponseDTO.Description;
         dbUser.Gmail = userResponseDTO.Gmail;
 
-        var path = Path.Combine(Directory.GetCurrentDirectory(), "Archivos", "profilePhotos", userResponseDTO.Image.FileName);
+        if(userResponseDTO.Image != null){
+            var path = Path.Combine(Directory.GetCurrentDirectory(),"Archivos","profilePhotos", userResponseDTO.Image.FileName);
 
-        using (var stream = new FileStream(path, FileMode.Create))
+            using (var stream = new FileStream(path, FileMode.Create))
+            {
+                await userResponseDTO.Image.CopyToAsync(stream);
+            };
+
+            dbUser.Image = new api_portafolio.Entities.Common.Image
+            {
+                Path = path,
+                UploadDate = DateTime.Now,
+                Url = ""
+            };
+        }
+
+        if (userResponseDTO.ProjectId.HasValue)
         {
-            await userResponseDTO.Image.CopyToAsync(stream);
-        };
+            var existingProject = await this.dataContext.Projects.FindAsync(userResponseDTO.ProjectId.Value);
+            if (existingProject == null)
+            {
+                return BadRequest("Proyecto no encontrado");
+            }
+            dbUser.Projects = new List<Project> { existingProject };
+        }
 
-        dbUser.Image = new api_portafolio.Entities.Common.Image
+        if (userResponseDTO.BlogId.HasValue)
         {
-            Path = path,
-            UploadDate = DateTime.Now,
-            Url = ""
-        };
+            var existingBlog = await this.dataContext.Blogs.FindAsync(userResponseDTO.BlogId.Value);
+            if (existingBlog == null)
+            {
+                return BadRequest("Blog no encontrado");
+            }
+            dbUser.Blogs = new List<Blog> { existingBlog };
+        }
 
+        if (userResponseDTO.TecnologyId.HasValue)
+        {
+            var existingTecnology = await this.dataContext.Technologies.FindAsync(userResponseDTO.TecnologyId.Value);
+            if (existingTecnology == null)
+            {
+                return BadRequest("Tecnology no encontrado");
+            }
+            dbUser.Technologies = new List<Technology> { existingTecnology };
+        }
+
+        if (userResponseDTO.SoftSkillId.HasValue)
+        {
+            var existingSoftSkill = await this.dataContext.SoftSkills.FindAsync(userResponseDTO.SoftSkillId.Value);
+            if (existingSoftSkill == null)
+            {
+                return BadRequest("SoftSkill no encontrado");
+            }
+            dbUser.SoftSkills = new List<SoftSkill> { existingSoftSkill };
+        }
+
+        
         await this.dataContext.SaveChangesAsync();
 
-        return Ok(dbUser);
+        return Ok();
     }
 
     [HttpDelete("{id}")]

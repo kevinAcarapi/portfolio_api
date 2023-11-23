@@ -85,6 +85,7 @@ public class ProjectController : ControllerBase
             },
             Title = projectResponseDTO.Title,
         };
+
         await this.dataContext.Projects.AddAsync(project);
 
         await this.dataContext.SaveChangesAsync();
@@ -101,18 +102,41 @@ public class ProjectController : ControllerBase
         {
             Project dbproject = await this.dataContext.Projects.FindAsync(id);
             if(dbproject == null){
-                return NotFound("Usuario no encontrado");
+                return NotFound("Proyecto no encontrado");
             };
 
             dbproject.Id = project.Id;
             dbproject.Description = project.Description;
             dbproject.Enlace = project.Enlace;
-            // dbproject.Imagen = project.Imagen;
             dbproject.Title = project.Title;
-
+            
             await this.dataContext.SaveChangesAsync();
         }
 
         return Ok(project);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> Delete(long id)
+    {
+        Project dbProject = await this.dataContext.Projects
+            .Include(project => project.Image)
+            .Include(project => project.TechnologiesByProject)
+            .ThenInclude(technologyByProject => technologyByProject.Technology)
+            .Where(project => project.Id == id).FirstOrDefaultAsync();
+
+        if (dbProject == null)
+        {
+            return NotFound("Proyecto no encontrado");
+        }
+        if (dbProject.Image != null)
+        {
+            this.dataContext.Images.RemoveRange(dbProject.Image);
+        }
+
+        this.dataContext.TechnologiesByProject.RemoveRange(dbProject.TechnologiesByProject);
+        this.dataContext.Projects.Remove(dbProject);
+        await this.dataContext.SaveChangesAsync();
+        return Ok(dbProject);
     }
 }

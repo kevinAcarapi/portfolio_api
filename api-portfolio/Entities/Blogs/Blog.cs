@@ -1,4 +1,4 @@
-
+using api_portafolio.Entities.Common;
 namespace api_portafolio.Entities.Blogs;
 public class Blog
 {
@@ -14,8 +14,8 @@ public class Blog
             this.id = value;
         }
     }
-    private string imagen = "";
-    public string Imagen 
+    private Image? imagen;
+    public Image? Imagen 
     {
         get 
         {
