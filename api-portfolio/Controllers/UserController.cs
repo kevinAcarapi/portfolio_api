@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using api_portafolio.DTO.User;
 using api_portafolio.Entities.Projects;
 using api_portafolio.DTO.ProjectDTO;
+using api_portafolio.Entities.Blogs;
 
 namespace api_portfolio.Controllers;
 
@@ -76,24 +77,20 @@ public class UserController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> Post([FromForm] UserResponseDTO userResponseDTO)
     {
-        if(userResponseDTO.Image == null)
+        if (userResponseDTO.Image == null)
         {
             return BadRequest("Archivo no encontrado");
         };
 
         var path = Path.Combine(Directory.GetCurrentDirectory(), "Archivos", "profilePhotos", userResponseDTO.Image.FileName);
 
-        using(var stream = new FileStream(path, FileMode.Create))
+        using (var stream = new FileStream(path, FileMode.Create))
         {
             await userResponseDTO.Image.CopyToAsync(stream);
         };
-        
-        Project? project = 
-            await this.dataContext
-                .Projects
-                .FindAsync(userResponseDTO.IdProject);
 
-        User user = new User{
+        User user = new User
+        {
             Id = userResponseDTO.Id,
             Apellido = userResponseDTO.Apellido,
             Nombre = userResponseDTO.Nombre,
@@ -101,14 +98,52 @@ public class UserController : ControllerBase
             Curriculum = userResponseDTO.Curriculum,
             Gmail = userResponseDTO.Gmail,
             Profesion = userResponseDTO.Profesion,
-            Image = new api_portafolio.Entities.Common.Image 
+            Image = new api_portafolio.Entities.Common.Image
             {
                 Path = path,
                 UploadDate = DateTime.Now,
                 Url = ""
             },
-            
         };
+        if (userResponseDTO.ProjectId.HasValue)
+        {
+            var existingProject = await this.dataContext.Projects.FindAsync(userResponseDTO.ProjectId.Value);
+            if (existingProject == null)
+            {
+                return BadRequest("Proyecto no encontrado");
+            }
+            user.Projects = new List<Project> { existingProject };
+        }
+
+        if (userResponseDTO.BlogId.HasValue)
+        {
+            var existingBlog = await this.dataContext.Blogs.FindAsync(userResponseDTO.BlogId.Value);
+            if (existingBlog == null)
+            {
+                return BadRequest("Blog no encontrado");
+            }
+            user.Blogs = new List<Blog> { existingBlog };
+        }
+
+        if (userResponseDTO.TecnologyId.HasValue)
+        {
+            var existingTecnology = await this.dataContext.Technologies.FindAsync(userResponseDTO.TecnologyId.Value);
+            if (existingTecnology == null)
+            {
+                return BadRequest("Tecnology no encontrado");
+            }
+            user.Technologies = new List<Technology> { existingTecnology };
+        }
+
+        if (userResponseDTO.SoftSkillId.HasValue)
+        {
+            var existingSoftSkill = await this.dataContext.SoftSkills.FindAsync(userResponseDTO.SoftSkillId.Value);
+            if (existingSoftSkill == null)
+            {
+                return BadRequest("SoftSkill no encontrado");
+            }
+            user.SoftSkills = new List<SoftSkill> { existingSoftSkill };
+        }
 
         await this.dataContext.Users.AddAsync(user);
 
@@ -124,11 +159,11 @@ public class UserController : ControllerBase
         [FromForm] UserResponseDTO userResponseDTO)
     {
         User? dbUser = await this.dataContext.Users.FindAsync(id);
-        if(dbUser == null)
+        if (dbUser == null)
         {
             return NotFound("Usuario no encontrado");
         }
-        
+
         dbUser.Nombre = userResponseDTO.Nombre;
         dbUser.Apellido = userResponseDTO.Apellido;
         dbUser.Curriculum = userResponseDTO.Curriculum;
@@ -138,22 +173,22 @@ public class UserController : ControllerBase
 
         var path = Path.Combine(Directory.GetCurrentDirectory(), "Archivos", "profilePhotos", userResponseDTO.Image.FileName);
 
-        using(var stream = new FileStream(path, FileMode.Create))
+        using (var stream = new FileStream(path, FileMode.Create))
         {
             await userResponseDTO.Image.CopyToAsync(stream);
         };
 
-        dbUser.Image = new api_portafolio.Entities.Common.Image 
-            {
-                Path = path,
-                UploadDate = DateTime.Now,
-                Url = ""
-            };
+        dbUser.Image = new api_portafolio.Entities.Common.Image
+        {
+            Path = path,
+            UploadDate = DateTime.Now,
+            Url = ""
+        };
 
         await this.dataContext.SaveChangesAsync();
 
         return Ok(dbUser);
-    }   
+    }
 
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete(long id)
@@ -175,12 +210,13 @@ public class UserController : ControllerBase
         {
             return NotFound("Usuario no encontrado");
         }
-        if (dbUser.Image != null){
+        if (dbUser.Image != null)
+        {
             this.dataContext.Images.RemoveRange(dbUser.Image);
         }
-        
+
         this.dataContext.Projects.RemoveRange(dbUser.Projects);
-        
+
         this.dataContext.Technologies.RemoveRange(dbUser.Technologies);
         this.dataContext.SoftSkills.RemoveRange(dbUser.SoftSkills);
         this.dataContext.Blogs.RemoveRange(dbUser.Blogs);

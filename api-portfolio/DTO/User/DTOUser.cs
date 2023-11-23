@@ -106,5 +106,8 @@ public class UserResponseDTO
             this.image = value;
         }
     }
-    public long? IdProject {get;set;}
+    public long? ProjectId {get;set;}
+    public long? BlogId {get;set;}
+    public long?  TecnologyId {get;set;}
+    public long? SoftSkillId {get;set;}
 }

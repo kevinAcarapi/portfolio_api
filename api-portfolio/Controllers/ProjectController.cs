@@ -7,8 +7,6 @@ using System.Diagnostics.CodeAnalysis;
 using api_portafolio.DTO.ProjectDTO;
 using api_portafolio.Entities.TechnologiesCatalog;
 using api_portafolio.DTO.Tecnology;
-using api_portafolio.Entities.Common;
-using api_portafolio.DTO.Common;
 namespace api_portfolio.Controllers;
 
 [ApiController]
@@ -61,14 +59,14 @@ public class ProjectController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<Project>> Post([FromForm] ProjectResponseDTO projectResponseDTO)
+    public async Task<ActionResult> Post([FromForm] ProjectResponseDTO projectResponseDTO)
     {
         if(projectResponseDTO.Imagen == null)
         {
             return BadRequest("Archivo no encontrado");
         };
 
-        string path = Path.Combine(Directory.GetCurrentDirectory(), "Archivos\\projectPhotos", projectResponseDTO.Imagen.FileName);
+        string path = Path.Combine(Directory.GetCurrentDirectory(), "Archivos","projectPhotos", projectResponseDTO.Imagen.FileName);
 
         using(var stream = new FileStream(path, FileMode.Create))
         {
@@ -87,6 +85,10 @@ public class ProjectController : ControllerBase
             },
             Title = projectResponseDTO.Title,
         };
+        await this.dataContext.Projects.AddAsync(project);
+
+        await this.dataContext.SaveChangesAsync();
+
         return Ok();
     }
 
