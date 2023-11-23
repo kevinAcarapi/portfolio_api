@@ -2,6 +2,8 @@ namespace api_portafolio.DTO.SoftSkill;
 
 public class SoftSkillResponseDTO
 {
+
+    
     private long id = 0;
     public long Id 
     {
@@ -27,4 +29,20 @@ public class SoftSkillResponseDTO
             this.description = value;
         }
     }
+
+    private IFormFile? image;
+    public IFormFile? Image 
+    {
+        get 
+        {
+            return this.image;
+        }
+        set
+        {
+            this.image = value;
+        } 
+    }
+
+
+
 }
