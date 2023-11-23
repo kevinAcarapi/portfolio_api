@@ -7,6 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using api_portafolio.DTO.ProjectDTO;
 using api_portafolio.Entities.TechnologiesCatalog;
 using api_portafolio.DTO.Tecnology;
+
 namespace api_portfolio.Controllers;
 
 [ApiController]
@@ -22,15 +23,17 @@ public class ProjectController : ControllerBase
     }
 
     [HttpGet("user/{id}")]
-    public async Task<ActionResult<List<Project>>> GetProjectsByUser(long id)
+    public async Task<ActionResult<List<ProjectResponseDTO>>> GetProjectsByUser(long id)
     {
         User? user =await this.dataContext.Users
+            .Include(user => user.Image)
             .Include(user => user.Projects)
+            .ThenInclude(project => project.Image)
             .ThenInclude(project => project.TechnologiesByProject)
             .ThenInclude(technologyByProject => technologyByProject.Technology)
             .Where(user => user.Id == id)
             .FirstOrDefaultAsync();
-
+        
         if (user == null)
         {
             return NotFound("Usuario no encontrado");
@@ -52,7 +55,9 @@ public class ProjectController : ControllerBase
                 Id = project.Id,
                 Title = project.Title,
                 Description = project.Description,
-                Enlace = project.Enlace
+                Enlace = project.Enlace,
+                urlImage = "/Image/" + (project.Image != null ? project.Image.Id.ToString() : "")
+                
             });
         }
         return Ok(projectResponseDTOs);
