@@ -7,6 +7,9 @@ using System.Diagnostics.CodeAnalysis;
 using api_portafolio.DTO.ProjectDTO;
 using api_portafolio.Entities.TechnologiesCatalog;
 using api_portafolio.DTO.Tecnology;
+using api_portafolio.Entities.Common;
+using System.Linq.Expressions;
+using api_portafolio.Entities.Skills.TechnicalSkills;
 
 namespace api_portfolio.Controllers;
 
@@ -25,12 +28,13 @@ public class ProjectController : ControllerBase
     [HttpGet("user/{id}")]
     public async Task<ActionResult<List<ProjectResponseDTO>>> GetProjectsByUser(long id)
     {
-        User? user =await this.dataContext.Users
+        User? user =await dataContext.Users
             .Include(user => user.Image)
             .Include(user => user.Projects)
-            .ThenInclude(project => project.Image)
             .ThenInclude(project => project.TechnologiesByProject)
             .ThenInclude(technologyByProject => technologyByProject.Technology)
+            .Include(user => user.Projects)
+            .ThenInclude(project => project.Image)
             .Where(user => user.Id == id)
             .FirstOrDefaultAsync();
         
@@ -41,10 +45,12 @@ public class ProjectController : ControllerBase
 
         List<ProjectResponseDTO> projectResponseDTOs = new List<ProjectResponseDTO>();
 
-        foreach(Project project in user.Projects){
+        foreach(Project project in user.Projects)
+        {
             List<TechnologyDTOResponse> technologyDTOResponses = new List<TechnologyDTOResponse>();
 
-            foreach (TechnologyByProject technologyByProject in project.TechnologiesByProject){
+            foreach (TechnologyByProject technologyByProject in project.TechnologiesByProject)
+            {
                 technologyDTOResponses.Add(new TechnologyDTOResponse{
                     Id = technologyByProject.Technology.Id,
                     Description = technologyByProject.Technology.Description
@@ -60,6 +66,7 @@ public class ProjectController : ControllerBase
                 
             });
         }
+
         return Ok(projectResponseDTOs);
     }
 
