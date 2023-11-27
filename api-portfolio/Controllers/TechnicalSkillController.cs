@@ -27,24 +27,50 @@ public class TecnologyController : ControllerBase
             .Where(user => user.Id == id)
             .FirstOrDefaultAsync();
 
-        List<TechnologyDTOResponse> technologyDTOResponses = new List<TechnologyDTOResponse>();
+        if (user == null)
+        {
+            return NotFound("Usuario no encontrado");
+        }
 
-        foreach(Technology technology in user.Technologies){
-            technologyDTOResponses.Add(new TechnologyDTOResponse{
+        List<TechnologyDTOResponse> technologyDTOResponse = new List<TechnologyDTOResponse>();
+
+        foreach (Technology technology in user.Technologies)
+        {
+            technologyDTOResponse.Add(new TechnologyDTOResponse
+            {
                 Id = technology.Id,
                 Description = technology.Description
             });
         }
-        return Ok(technologyDTOResponses);
+        return Ok(technologyDTOResponse);    
+
     }
 
     [HttpPost]
     public async Task<ActionResult> Post([FromForm] TechnologyDTOResponse technologyDTOResponse)
     {
+         if (technologyDTOResponse.Image == null)
+        {
+            return BadRequest("Archivo no encontrado");
+        };
+
+        string path = Path.Combine(Directory.GetCurrentDirectory(), "Archivos", "technologyPhotos", technologyDTOResponse.Image.FileName);
+
+        using (var stream = new FileStream(path, FileMode.Create))
+        {
+            await technologyDTOResponse.Image.CopyToAsync(stream);
+        };
+
         Technology technology = new Technology
         {
             Id = technologyDTOResponse.Id,
-            Description = technologyDTOResponse.Description
+            Description = technologyDTOResponse.Description,
+            Image = new api_portafolio.Entities.Common.Image
+            {
+                Path = path,
+                UploadDate = DateTime.Now,
+                Url = ""
+            },
         };
 
         await this.dataContext.Technologies.AddAsync(technology);
@@ -67,18 +93,40 @@ public class TecnologyController : ControllerBase
         dbTechnology.Id = technologyDTOResponse.Id;
         dbTechnology.Description = technologyDTOResponse.Description;
 
+        var path = Path.Combine(Directory.GetCurrentDirectory(), "Archivos", "technologyPhotos", technologyDTOResponse.Image.FileName);
+
+        using (var stream = new FileStream(path, FileMode.Create))
+        {
+            await technologyDTOResponse.Image.CopyToAsync(stream);
+        };
+
+        dbTechnology.Image = new api_portafolio.Entities.Common.Image
+        {
+            Path = path,
+            UploadDate = DateTime.Now,
+            Url = ""
+        };
+
         await this.dataContext.SaveChangesAsync();
 
         return Ok(dbTechnology);
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult> Delete(long id)
+    public async Task<ActionResult> Delete(long id)       
     {
-        Technology? dbTechnology = await this.dataContext.Technologies.FindAsync(id);
+        Technology? dbTechnology = await this.dataContext.Technologies
+            .Include(technology => technology.Image)
+            .Where(technology => technology.Id == id).FirstOrDefaultAsync();
+       
         if (dbTechnology == null)
         {
             return NotFound("Tecnología no encontrada");
+        }
+
+        if (dbTechnology.Image != null)
+        {
+            this.dataContext.Images.RemoveRange(dbTechnology.Image);
         }
 
         this.dataContext.Technologies.Remove(dbTechnology);

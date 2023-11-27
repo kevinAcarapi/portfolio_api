@@ -27,4 +27,17 @@ public class TechnologyDTOResponse
             this.description = value;
         }
     }
+
+    private IFormFile? image;
+    public IFormFile? Image 
+    {
+        get 
+        {
+            return this.image;
+        }
+        set
+        {
+            this.image = value;
+        } 
+    }
 }
