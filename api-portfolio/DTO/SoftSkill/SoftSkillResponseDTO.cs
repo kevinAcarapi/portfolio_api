@@ -43,6 +43,6 @@ public class SoftSkillResponseDTO
         } 
     }
 
-
+    public long? UserId;
 
 }

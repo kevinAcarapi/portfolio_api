@@ -112,6 +112,29 @@ public class SoftSkillController : ControllerBase
         return Ok(dbSoftSkill);
     }
 
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> Delete(long id)
+    {
+        SoftSkill? dbSoftSkill = await this.dataContext.SoftSkills
+        .Include(softSkill => softSkill.Image)
+        .Where(softSkill => softSkill.Id == id).FirstOrDefaultAsync();
+
+        if (dbSoftSkill == null)
+        {
+            return NotFound("Tecnología no encontrada");
+        }
+
+        if (dbSoftSkill.Image != null)
+        {
+            this.dataContext.Images.RemoveRange(dbSoftSkill.Image);
+        }
+
+        this.dataContext.SoftSkills.Remove(dbSoftSkill);
+        await this.dataContext.SaveChangesAsync();
+
+        return Ok();
+    }        
+
 
 
 }
