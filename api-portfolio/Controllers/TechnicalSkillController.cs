@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using api_portafolio.Entities.Skills.TechnicalSkills;
 using System.Diagnostics.CodeAnalysis;
 using api_portafolio.DTO.Tecnology;
+using api_portafolio.Entities.Common;
 namespace api_portfolio.Controllers;
 
 [ApiController]
@@ -22,7 +23,7 @@ public class TecnologyController : ControllerBase
     [HttpGet("user/{id}")]
     public async Task<ActionResult<Technology>> GetTecnologyByUser(long id)
     {
-        User user =await this.dataContext.Users
+        User user = await this.dataContext.Users
             .Include(user => user.Technologies)
             .Where(user => user.Id == id)
             .FirstOrDefaultAsync();
@@ -42,14 +43,14 @@ public class TecnologyController : ControllerBase
                 Description = technology.Description
             });
         }
-        return Ok(technologyDTOResponse);    
+        return Ok(technologyDTOResponse);
 
     }
 
     [HttpPost]
     public async Task<ActionResult> Post([FromForm] TechnologyDTOResponse technologyDTOResponse)
     {
-         if (technologyDTOResponse.Image == null)
+        if (technologyDTOResponse.Image == null)
         {
             return BadRequest("Archivo no encontrado");
         };
@@ -82,7 +83,7 @@ public class TecnologyController : ControllerBase
     [HttpPut("{id}")]
     public async Task<ActionResult<TechnologyDTOResponse>> Put(
         [FromRoute] long id,
-        [FromForm] TechnologyDTOResponse technologyDTOResponse)
+        [FromForm] TechnologyDTORequest technologyDTORequest)
     {
         Technology? dbTechnology = await this.dataContext.Technologies.FindAsync(id);
         if (dbTechnology == null)
@@ -90,35 +91,55 @@ public class TecnologyController : ControllerBase
             return NotFound("Tecnología no encontrada");
         }
 
-        dbTechnology.Id = technologyDTOResponse.Id;
-        dbTechnology.Description = technologyDTOResponse.Description;
+        dbTechnology.Description = technologyDTORequest.Description ?? dbTechnology.Description;
 
-        var path = Path.Combine(Directory.GetCurrentDirectory(), "Archivos", "technologyPhotos", technologyDTOResponse.Image.FileName);
+        var newImage = technologyDTORequest.Image != null ? await SaveImage(technologyDTORequest.Image) : dbTechnology.Image;
 
-        using (var stream = new FileStream(path, FileMode.Create))
+        if (newImage != null)
         {
-            await technologyDTOResponse.Image.CopyToAsync(stream);
-        };
+            dbTechnology.Image = newImage;
+        }
 
-        dbTechnology.Image = new api_portafolio.Entities.Common.Image
+        await this.dataContext.SaveChangesAsync();
+
+        return Ok(technologyDTORequest);
+    }
+
+    private async Task<Image> SaveImage(IFormFile imageFile)
+    {
+        if (imageFile == null || imageFile.Length == 0)
         {
-            Path = path,
+            return null;
+        }
+
+        string path = Path.Combine(Directory.GetCurrentDirectory(), "Archivos", "technicalSkillPhotos", imageFile.FileName);
+
+        string imagePath = Path.Combine("Archivos", "technicalSkillPhotos", path);
+
+
+        using (var fileStream = new FileStream(imagePath, FileMode.Create))
+        {
+            await imageFile.CopyToAsync(fileStream);
+        }
+
+        Image image = new Image
+        {
+            Path = imagePath,
             UploadDate = DateTime.Now,
             Url = ""
         };
 
-        await this.dataContext.SaveChangesAsync();
+        return image;
 
-        return Ok(dbTechnology);
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult> Delete(long id)       
+    public async Task<ActionResult> Delete(long id)
     {
         Technology? dbTechnology = await this.dataContext.Technologies
             .Include(technology => technology.Image)
             .Where(technology => technology.Id == id).FirstOrDefaultAsync();
-       
+
         if (dbTechnology == null)
         {
             return NotFound("Tecnología no encontrada");
@@ -133,5 +154,5 @@ public class TecnologyController : ControllerBase
         await this.dataContext.SaveChangesAsync();
 
         return Ok();
-    }        
+    }
 }

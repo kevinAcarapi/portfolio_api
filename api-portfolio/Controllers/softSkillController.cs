@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using api_portafolio.Entities.Skills.SoftSkills;
 using System.Diagnostics.CodeAnalysis;
 using api_portafolio.DTO.SoftSkill;
+using api_portafolio.Entities.Common;
 namespace api_portfolio.Controllers;
 
 [ApiController]
@@ -82,7 +83,7 @@ public class SoftSkillController : ControllerBase
     [HttpPut("{id}")]
     public async Task<ActionResult<SoftSkillResponseDTO>> Put(
     [FromRoute] long id,
-    [FromForm] SoftSkillResponseDTO softSkillResponseDTO)
+    [FromForm] SoftSkillRequestDTO softSkillRequestDTO)
     {
         SoftSkill? dbSoftSkill = await this.dataContext.SoftSkills.FindAsync(id);
         if (dbSoftSkill == null)
@@ -90,26 +91,46 @@ public class SoftSkillController : ControllerBase
             return NotFound("Habilidad no encontrada");
         }
 
-        dbSoftSkill.Id = softSkillResponseDTO.Id;
-        dbSoftSkill.Description = softSkillResponseDTO.Description;
+        dbSoftSkill.Description = softSkillRequestDTO.Description ?? dbSoftSkill.Description;
 
-        var path = Path.Combine(Directory.GetCurrentDirectory(), "Archivos", "softSkillsPhotos", softSkillResponseDTO.Image.FileName);
+        var newImage = softSkillRequestDTO.Image != null ? await SaveImage(softSkillRequestDTO.Image) : dbSoftSkill.Image;
 
-        using (var stream = new FileStream(path, FileMode.Create))
+        if (newImage != null)
         {
-            await softSkillResponseDTO.Image.CopyToAsync(stream);
-        };
-
-        dbSoftSkill.Image = new api_portafolio.Entities.Common.Image
-        {
-            Path = path,
-            UploadDate = DateTime.Now,
-            Url = ""
-        };
+            dbSoftSkill.Image = newImage;
+        }
 
         await this.dataContext.SaveChangesAsync();
 
         return Ok(dbSoftSkill);
+    }
+
+    private async Task<Image> SaveImage(IFormFile imageFile)
+    {
+        if (imageFile == null || imageFile.Length == 0)
+        {
+            return null;
+        }
+
+        string path = Path.Combine(Directory.GetCurrentDirectory(), "Archivos", "softSkillsPhotos", imageFile.FileName);
+
+        string imagePath = Path.Combine("Archivos", "softSkillsPhotos", path);
+
+
+        using (var fileStream = new FileStream(imagePath, FileMode.Create))
+        {
+            await imageFile.CopyToAsync(fileStream);
+        }
+
+        Image image = new Image
+        {
+            Path = imagePath,
+            UploadDate = DateTime.Now,
+            Url = ""
+        };
+
+        return image;
+
     }
 
     [HttpDelete("{id}")]
@@ -133,7 +154,7 @@ public class SoftSkillController : ControllerBase
         await this.dataContext.SaveChangesAsync();
 
         return Ok();
-    }        
+    }
 
 
 

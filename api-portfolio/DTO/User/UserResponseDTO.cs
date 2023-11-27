@@ -1,5 +1,3 @@
-using api_portafolio.DTO.ProjectDTO;
-
 namespace api_portafolio.DTO.User;
 public class UserResponseDTO
 {

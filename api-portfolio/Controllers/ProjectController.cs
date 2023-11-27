@@ -7,8 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using api_portafolio.DTO.ProjectDTO;
 using api_portafolio.Entities.TechnologiesCatalog;
 using api_portafolio.DTO.Tecnology;
-using System.Linq.Expressions;
-using api_portafolio.Entities.Skills.TechnicalSkills;
+using api_portafolio.Entities.Common;
 
 namespace api_portfolio.Controllers;
 
@@ -27,7 +26,7 @@ public class ProjectController : ControllerBase
     [HttpGet("user/{id}")]
     public async Task<ActionResult<List<ProjectResponseDTO>>> GetProjectsByUser(long id)
     {
-        User? user =await dataContext.Users
+        User? user = await dataContext.Users
             .Include(user => user.Projects)
             .ThenInclude(project => project.TechnologiesByProject)
             .ThenInclude(technologyByProject => technologyByProject.Technology)
@@ -35,7 +34,7 @@ public class ProjectController : ControllerBase
             .ThenInclude(project => project.Image)
             .Where(user => user.Id == id)
             .FirstOrDefaultAsync();
-        
+
         if (user == null)
         {
             return NotFound("Usuario no encontrado");
@@ -43,25 +42,26 @@ public class ProjectController : ControllerBase
 
         List<ProjectResponseDTO> projectResponseDTOs = new List<ProjectResponseDTO>();
 
-        foreach(Project project in user.Projects)
+        foreach (Project project in user.Projects)
         {
             List<TechnologyDTOResponse> technologyDTOResponses = new List<TechnologyDTOResponse>();
 
             foreach (TechnologyByProject technologyByProject in project.TechnologiesByProject)
             {
-                technologyDTOResponses.Add(new TechnologyDTOResponse{
+                technologyDTOResponses.Add(new TechnologyDTOResponse
+                {
                     Id = technologyByProject.Technology.Id,
                     Description = technologyByProject.Technology.Description
                 });
             }
 
-            projectResponseDTOs.Add(new ProjectResponseDTO{
+            projectResponseDTOs.Add(new ProjectResponseDTO
+            {
                 Id = project.Id,
                 Title = project.Title,
                 Description = project.Description,
                 Enlace = project.Enlace,
                 urlImage = "/Image/" + (project.Image != null ? project.Image.Id.ToString() : "")
-                
             });
         }
 
@@ -71,23 +71,24 @@ public class ProjectController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> Post([FromForm] ProjectResponseDTO projectResponseDTO)
     {
-        if(projectResponseDTO.Imagen == null)
+        if (projectResponseDTO.Imagen == null)
         {
             return BadRequest("Archivo no encontrado");
         };
 
-        string path = Path.Combine(Directory.GetCurrentDirectory(), "Archivos","projectPhotos", projectResponseDTO.Imagen.FileName);
+        string path = Path.Combine(Directory.GetCurrentDirectory(), "Archivos", "projectPhotos", projectResponseDTO.Imagen.FileName);
 
-        using(var stream = new FileStream(path, FileMode.Create))
+        using (var stream = new FileStream(path, FileMode.Create))
         {
             await projectResponseDTO.Imagen.CopyToAsync(stream);
         };
 
-        Project project = new Project{
+        Project project = new Project
+        {
             Id = projectResponseDTO.Id,
             Description = projectResponseDTO.Description,
             Enlace = projectResponseDTO.Enlace,
-            Image = new api_portafolio.Entities.Common.Image 
+            Image = new api_portafolio.Entities.Common.Image
             {
                 Path = path,
                 UploadDate = DateTime.Now,
@@ -105,26 +106,62 @@ public class ProjectController : ControllerBase
 
     [HttpPut("{id}")]
     public async Task<ActionResult<ProjectResponseDTO>> Put(
-        [FromRoute] long id,
-        [FromForm] ProjectResponseDTO projectResponseDTO)
+    [FromRoute] long id,
+    [FromForm] ProjectRequestDTO projectRequetsDTO)
     {
         if (this.dataContext != null && this.dataContext.Projects != null)
         {
             Project dbproject = await this.dataContext.Projects.FindAsync(id);
-            if(dbproject == null){
+            if (dbproject == null)
+            {
                 return NotFound("Proyecto no encontrado");
             };
 
-            dbproject.Id = projectResponseDTO.Id; 
-            dbproject.Description = projectResponseDTO.Description;
-            dbproject.Enlace = projectResponseDTO.Enlace;
-            dbproject.Title = projectResponseDTO.Title;
-            
+            var newImage = projectRequetsDTO.Imagen != null ? await SaveImage(projectRequetsDTO.Imagen) : dbproject.Image;
+
+            if (newImage != null)
+            {
+                dbproject.Image = newImage;
+            }
+
+            dbproject.Title = projectRequetsDTO.Title ?? dbproject.Title;
+            dbproject.Description = projectRequetsDTO.Description ?? dbproject.Description;
+            dbproject.Enlace = projectRequetsDTO.Enlace ?? dbproject.Enlace;
+
             await this.dataContext.SaveChangesAsync();
         }
 
-        return Ok(projectResponseDTO);
+        return Ok(projectRequetsDTO);
     }
+
+    private async Task<Image> SaveImage(IFormFile imageFile)
+    {
+        if (imageFile == null || imageFile.Length == 0)
+        {
+            return null;
+        }
+
+        string path = Path.Combine(Directory.GetCurrentDirectory(), "Archivos", "projectPhotos", imageFile.FileName);
+
+        string imagePath = Path.Combine("Archivos", "projectPhotos", path);
+
+        
+            using (var fileStream = new FileStream(imagePath, FileMode.Create))
+            {
+                await imageFile.CopyToAsync(fileStream);
+            }
+
+            Image image = new Image{
+                Path = imagePath,
+                UploadDate = DateTime.Now,
+                Url = ""
+            };
+
+            // Devuelve la ruta de la imagen
+            return image;
+        
+    }
+
 
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete(long id)
