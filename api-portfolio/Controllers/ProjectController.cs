@@ -7,7 +7,6 @@ using System.Diagnostics.CodeAnalysis;
 using api_portafolio.DTO.ProjectDTO;
 using api_portafolio.Entities.TechnologiesCatalog;
 using api_portafolio.DTO.Tecnology;
-using api_portafolio.Entities.Common;
 using System.Linq.Expressions;
 using api_portafolio.Entities.Skills.TechnicalSkills;
 
@@ -29,7 +28,6 @@ public class ProjectController : ControllerBase
     public async Task<ActionResult<List<ProjectResponseDTO>>> GetProjectsByUser(long id)
     {
         User? user =await dataContext.Users
-            .Include(user => user.Image)
             .Include(user => user.Projects)
             .ThenInclude(project => project.TechnologiesByProject)
             .ThenInclude(technologyByProject => technologyByProject.Technology)
@@ -106,9 +104,9 @@ public class ProjectController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<Project>> Put(
+    public async Task<ActionResult<ProjectResponseDTO>> Put(
         [FromRoute] long id,
-        [FromForm] Project project)
+        [FromForm] ProjectResponseDTO projectResponseDTO)
     {
         if (this.dataContext != null && this.dataContext.Projects != null)
         {
@@ -117,15 +115,15 @@ public class ProjectController : ControllerBase
                 return NotFound("Proyecto no encontrado");
             };
 
-            dbproject.Id = project.Id;
-            dbproject.Description = project.Description;
-            dbproject.Enlace = project.Enlace;
-            dbproject.Title = project.Title;
+            dbproject.Id = projectResponseDTO.Id; 
+            dbproject.Description = projectResponseDTO.Description;
+            dbproject.Enlace = projectResponseDTO.Enlace;
+            dbproject.Title = projectResponseDTO.Title;
             
             await this.dataContext.SaveChangesAsync();
         }
 
-        return Ok(project);
+        return Ok(projectResponseDTO);
     }
 
     [HttpDelete("{id}")]
