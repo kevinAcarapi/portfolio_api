@@ -40,4 +40,6 @@ public class TechnologyDTOResponse
             this.image = value;
         } 
     }
+
+    public long? UserId;
 }

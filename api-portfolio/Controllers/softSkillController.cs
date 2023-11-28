@@ -73,6 +73,22 @@ public class SoftSkillController : ControllerBase
             },
         };
 
+        User? dbUser = await this.dataContext.Users.FindAsync(softSkillResponseDTO.UserId);
+        if (dbUser == null)
+        {
+            return NotFound("Usuario no encontrado");
+        }
+
+        if (softSkillResponseDTO.UserId.HasValue)
+        {
+            var existingUser = await this.dataContext.Users.FindAsync(softSkillResponseDTO.UserId.Value);
+            if (existingUser == null)
+            {
+                return BadRequest("Usuario no encontrado");
+            }
+            dbUser.SoftSkills = new List<SoftSkill> { softSkill };
+        }
+
         await this.dataContext.SoftSkills.AddAsync(softSkill);
 
         await this.dataContext.SaveChangesAsync();

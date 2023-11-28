@@ -77,6 +77,22 @@ public class BlogController : ControllerBase
             },
         };
 
+        User? dbUser = await this.dataContext.Users.FindAsync(blogResponseDTO.UserId);
+        if (dbUser == null)
+        {
+            return NotFound("Usuario no encontrado");
+        }
+
+        if (blogResponseDTO.UserId.HasValue)
+        {
+            var existingUser = await this.dataContext.Users.FindAsync(blogResponseDTO.UserId.Value);
+            if (existingUser == null)
+            {
+                return BadRequest("Usuario no encontrado");
+            }
+            dbUser.Blogs = new List<Blog> { blog };
+        }
+
         await this.dataContext.Blogs.AddAsync(blog);
 
         await this.dataContext.SaveChangesAsync();

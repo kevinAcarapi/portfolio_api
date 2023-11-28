@@ -74,6 +74,22 @@ public class TecnologyController : ControllerBase
             },
         };
 
+        User? dbUser = await this.dataContext.Users.FindAsync(technologyDTOResponse.UserId);
+        if (dbUser == null)
+        {
+            return NotFound("Usuario no encontrado");
+        }
+
+        if (technologyDTOResponse.UserId.HasValue)
+        {
+            var existingUser = await this.dataContext.Users.FindAsync(technologyDTOResponse.UserId.Value);
+            if (existingUser == null)
+            {
+                return BadRequest("Usuario no encontrado");
+            }
+            dbUser.Technologies = new List<Technology> { technology };
+        }
+
         await this.dataContext.Technologies.AddAsync(technology);
         await this.dataContext.SaveChangesAsync();
 

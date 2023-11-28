@@ -8,6 +8,7 @@ using api_portafolio.DTO.ProjectDTO;
 using api_portafolio.Entities.TechnologiesCatalog;
 using api_portafolio.DTO.Tecnology;
 using api_portafolio.Entities.Common;
+using api_portafolio.Entities.Skills.TechnicalSkills;
 
 namespace api_portfolio.Controllers;
 
@@ -97,6 +98,37 @@ public class ProjectController : ControllerBase
             Title = projectResponseDTO.Title,
         };
 
+        User? dbUser = await this.dataContext.Users.FindAsync(projectResponseDTO.UserId);
+        if (dbUser == null)
+        {
+            return NotFound("Usuario no encontrado");
+        }
+
+        if (projectResponseDTO.UserId.HasValue)
+        {
+            var existingUser = await this.dataContext.Users.FindAsync(projectResponseDTO.UserId.Value);
+            if (existingUser == null)
+            {
+                return BadRequest("Usuario no encontrado");
+            }
+            dbUser.Projects = new List<Project> { project };
+        }
+
+  
+        Technology? dbTechnology = await this.dataContext.Technologies.FindAsync(projectResponseDTO.TechnologyId);
+        if (dbTechnology == null && projectResponseDTO.TechnologyId.HasValue)
+            {
+                return NotFound("Tecnologia no encontrada");
+            }
+
+        TechnologyByProject technologyByProject = new TechnologyByProject();
+
+        
+        technologyByProject.Technology = dbTechnology;
+
+        project.TechnologiesByProject = new List<TechnologyByProject> { technologyByProject };
+
+
         await this.dataContext.Projects.AddAsync(project);
 
         await this.dataContext.SaveChangesAsync();
@@ -145,21 +177,22 @@ public class ProjectController : ControllerBase
 
         string imagePath = Path.Combine("Archivos", "projectPhotos", path);
 
-        
-            using (var fileStream = new FileStream(imagePath, FileMode.Create))
-            {
-                await imageFile.CopyToAsync(fileStream);
-            }
 
-            Image image = new Image{
-                Path = imagePath,
-                UploadDate = DateTime.Now,
-                Url = ""
-            };
+        using (var fileStream = new FileStream(imagePath, FileMode.Create))
+        {
+            await imageFile.CopyToAsync(fileStream);
+        }
 
-            // Devuelve la ruta de la imagen
-            return image;
-        
+        Image image = new Image
+        {
+            Path = imagePath,
+            UploadDate = DateTime.Now,
+            Url = ""
+        };
+
+        // Devuelve la ruta de la imagen
+        return image;
+
     }
 
 
