@@ -13,6 +13,7 @@ using api_portafolio.Entities.Projects;
 using api_portafolio.DTO.ProjectDTO;
 using api_portafolio.Entities.Blogs;
 using api_portafolio.Entities.Common;
+using api_portafolio.Entities.TechnologiesCatalog;
 
 namespace api_portfolio.Controllers;
 
@@ -31,14 +32,9 @@ public class UserController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<User>> Get(long id)
     {
-        var options = new JsonSerializerOptions
-        {
-            ReferenceHandler = ReferenceHandler.Preserve
-        };
-
-        List<User> lista = new List<User>();
-
         User user = await this.dataContext.Users
+            .Include(user => user.Image)
+            .Include(user => user.Projects)
             .Where(user => user.Id == id)
             .FirstOrDefaultAsync();
 
@@ -46,6 +42,7 @@ public class UserController : ControllerBase
         {
             return NotFound("Usuario no encontrado");
         }
+
         UserResponseDTO userResponseDTO = new UserResponseDTO
         {
             Id = user.Id,
@@ -55,8 +52,12 @@ public class UserController : ControllerBase
             Curriculum = user.Curriculum,
             Gmail = user.Gmail,
             Profesion = user.Profesion,
+            urlImage = "/Image/" + (user.Image != null ? user.Image.Id.ToString() : "")
         };
-
+        if (user == null)
+        {
+            return NotFound("Usuario no encontrado");
+        }
         return Ok(userResponseDTO);
     }
 
@@ -85,51 +86,69 @@ public class UserController : ControllerBase
             Curriculum = userResponseDTO.Curriculum,
             Gmail = userResponseDTO.Gmail,
             Profesion = userResponseDTO.Profesion,
-            Image = new api_portafolio.Entities.Common.Image
+            Image = new Image
             {
                 Path = path,
                 UploadDate = DateTime.Now,
                 Url = ""
             },
+
         };
-        if (userResponseDTO.ProjectId.HasValue)
+
+        if (userResponseDTO.ProjectId != null && userResponseDTO.ProjectId.Count > 0)
         {
-            var existingProject = await this.dataContext.Projects.FindAsync(userResponseDTO.ProjectId.Value);
-            if (existingProject == null)
+            user.Projects = new List<Project> { };
+            foreach (long item in userResponseDTO.ProjectId)
             {
-                return BadRequest("Proyecto no encontrado");
+                var existingProject = await this.dataContext.Projects.FindAsync(item);
+                if (existingProject == null)
+                {
+                    return BadRequest("Proyecto no encontrado");
+                }
+                user.Projects.Add(existingProject);
             }
-            user.Projects = new List<Project> { existingProject };
         }
 
-        if (userResponseDTO.BlogId.HasValue)
+        if (userResponseDTO.BlogId != null && userResponseDTO.BlogId.Count > 0)
         {
-            var existingBlog = await this.dataContext.Blogs.FindAsync(userResponseDTO.BlogId.Value);
-            if (existingBlog == null)
+            user.Blogs = new List<Blog> { };
+            foreach (long item in userResponseDTO.BlogId)
             {
-                return BadRequest("Blog no encontrado");
+                var existingBlog = await this.dataContext.Blogs.FindAsync(item);
+                if (existingBlog == null)
+                {
+                    return BadRequest("Blog no encontrado");
+                }
+                user.Blogs.Add(existingBlog);
             }
-            user.Blogs = new List<Blog> { existingBlog };
         }
 
-        if (userResponseDTO.TecnologyId.HasValue)
+        if (userResponseDTO.TecnologyId != null && userResponseDTO.TecnologyId.Count > 0)
         {
-            var existingTecnology = await this.dataContext.Technologies.FindAsync(userResponseDTO.TecnologyId.Value);
-            if (existingTecnology == null)
+            user.Technologies = new List<Technology> { };
+            foreach (long item in userResponseDTO.TecnologyId)
             {
-                return BadRequest("Tecnology no encontrado");
+                var existingTecnology = await this.dataContext.Technologies.FindAsync(item);
+                if (existingTecnology == null)
+                {
+                    return BadRequest("Tecnologia no encontrada");
+                }
+                user.Technologies.Add(existingTecnology);
             }
-            user.Technologies = new List<Technology> { existingTecnology };
         }
 
-        if (userResponseDTO.SoftSkillId.HasValue)
+        if (userResponseDTO.SoftSkillId != null && userResponseDTO.SoftSkillId.Count > 0)
         {
-            var existingSoftSkill = await this.dataContext.SoftSkills.FindAsync(userResponseDTO.SoftSkillId.Value);
-            if (existingSoftSkill == null)
+            user.SoftSkills = new List<SoftSkill> { };
+            foreach (long item in userResponseDTO.SoftSkillId)
             {
-                return BadRequest("SoftSkill no encontrado");
+                var existingSoftSkill = await this.dataContext.SoftSkills.FindAsync(item);
+                if (existingSoftSkill == null)
+                {
+                    return BadRequest("SoftSkill no encontrado");
+                }
+                user.SoftSkills.Add(existingSoftSkill);
             }
-            user.SoftSkills = new List<SoftSkill> { existingSoftSkill };
         }
 
         await this.dataContext.Users.AddAsync(user);
@@ -166,47 +185,64 @@ public class UserController : ControllerBase
         }
 
 
-        if (userRequestDTO.ProjectId.HasValue)
+        if (userRequestDTO.ProjectId != null && userRequestDTO.ProjectId.Count > 0)
         {
-            var existingProject = await this.dataContext.Projects.FindAsync(userRequestDTO.ProjectId.Value);
-            if (existingProject == null)
+            dbUser.Projects = new List<Project> { };
+            foreach (long item in userRequestDTO.ProjectId)
             {
-                return BadRequest("Proyecto no encontrado");
+                var existingProject = await this.dataContext.Projects.FindAsync(item);
+                if (existingProject == null)
+                {
+                    return BadRequest("Proyecto no encontrado");
+                }
+                dbUser.Projects.Add(existingProject);
             }
-            dbUser.Projects = new List<Project> { existingProject };
         }
 
-        if (userRequestDTO.BlogId.HasValue)
+        if (userRequestDTO.BlogId != null && userRequestDTO.BlogId.Count > 0)
         {
-            var existingBlog = await this.dataContext.Blogs.FindAsync(userRequestDTO.BlogId.Value);
-            if (existingBlog == null)
+            dbUser.Blogs = new List<Blog> { };
+            foreach (long item in userRequestDTO.BlogId)
             {
-                return BadRequest("Blog no encontrado");
+                var existingBlog = await this.dataContext.Blogs.FindAsync(item);
+                if (existingBlog == null)
+                {
+                    return BadRequest("Blog no encontrado");
+                }
+
+                dbUser.Blogs.Add(existingBlog);
             }
-            dbUser.Blogs = new List<Blog> { existingBlog };
         }
 
-        if (userRequestDTO.TecnologyId.HasValue)
+        if (userRequestDTO.TecnologyId != null && userRequestDTO.TecnologyId.Count > 0)
         {
-            var existingTecnology = await this.dataContext.Technologies.FindAsync(userRequestDTO.TecnologyId.Value);
-            if (existingTecnology == null)
+            dbUser.Technologies = new List<Technology> { };
+            foreach (long item in userRequestDTO.TecnologyId)
             {
-                return BadRequest("Tecnology no encontrado");
+                var existingTecnology = await this.dataContext.Technologies.FindAsync(item);
+                if (existingTecnology == null)
+                {
+                    return BadRequest("Tecnologia no encontrada");
+                }
+                dbUser.Technologies.Add(existingTecnology);
             }
-            dbUser.Technologies = new List<Technology> { existingTecnology };
         }
 
-        if (userRequestDTO.SoftSkillId.HasValue)
+        if (userRequestDTO.SoftSkillId != null && userRequestDTO.SoftSkillId.Count > 0)
         {
-            var existingSoftSkill = await this.dataContext.SoftSkills.FindAsync(userRequestDTO.SoftSkillId.Value);
-            if (existingSoftSkill == null)
+            dbUser.SoftSkills = new List<SoftSkill> { };
+            foreach (long item in userRequestDTO.SoftSkillId)
             {
-                return BadRequest("SoftSkill no encontrado");
+                var existingSoftSkill = await this.dataContext.SoftSkills.FindAsync(item);
+                if (existingSoftSkill == null)
+                {
+                    return BadRequest("SoftSkill no encontrado");
+                }
+                dbUser.SoftSkills.Add(existingSoftSkill);
             }
-            dbUser.SoftSkills = new List<SoftSkill> { existingSoftSkill };
         }
 
-        
+
         await this.dataContext.SaveChangesAsync();
 
         return Ok(userRequestDTO);
@@ -223,20 +259,21 @@ public class UserController : ControllerBase
 
         string imagePath = Path.Combine("Archivos", "profilePhotos", path);
 
-        
-            using (var fileStream = new FileStream(imagePath, FileMode.Create))
-            {
-                await imageFile.CopyToAsync(fileStream);
-            }
 
-            Image image = new Image{
-                Path = imagePath,
-                UploadDate = DateTime.Now,
-                Url = ""
-            };
+        using (var fileStream = new FileStream(imagePath, FileMode.Create))
+        {
+            await imageFile.CopyToAsync(fileStream);
+        }
 
-            return image;
-        
+        Image image = new Image
+        {
+            Path = imagePath,
+            UploadDate = DateTime.Now,
+            Url = ""
+        };
+
+        return image;
+
     }
 
     [HttpDelete("{id}")]

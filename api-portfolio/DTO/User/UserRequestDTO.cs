@@ -14,8 +14,8 @@ public class UserRequestDTO
         }
     }
 
-    private string nombre = "";
-    public string Nombre 
+    private string? nombre;
+    public string? Nombre 
     {
         get 
         {
@@ -27,8 +27,8 @@ public class UserRequestDTO
         } 
     }
 
-    private string apellido = "";
-    public string Apellido 
+    private string? apellido;
+    public string? Apellido 
     {
         get 
         {
@@ -40,8 +40,8 @@ public class UserRequestDTO
         } 
     }
 
-    private string profesion = "";
-    public string Profesion 
+    private string? profesion;
+    public string? Profesion 
     {
         get 
         {
@@ -53,8 +53,8 @@ public class UserRequestDTO
         } 
     }
 
-    private string gmail = "";
-    public string Gmail 
+    private string? gmail;
+    public string? Gmail 
     {
         get 
         {
@@ -66,8 +66,8 @@ public class UserRequestDTO
         } 
     }
 
-    private string curriculum = "";
-    public string Curriculum 
+    private string? curriculum;
+    public string? Curriculum 
     {
         get 
         {
@@ -79,8 +79,8 @@ public class UserRequestDTO
         } 
     }
 
-    private string description = "";
-    public string Description 
+    private string? description;
+    public string? Description 
     {
         get 
         {
@@ -104,8 +104,10 @@ public class UserRequestDTO
             this.image = value;
         }
     }
-    public long? ProjectId {get;set;}
-    public long? BlogId {get;set;}
-    public long?  TecnologyId {get;set;}
-    public long? SoftSkillId {get;set;}
+
+    
+    public List<long>? ProjectId {get;set;}
+    public List<long>? BlogId {get;set;}
+    public List<long>?  TecnologyId {get;set;}
+    public List<long>? SoftSkillId {get;set;}
 }

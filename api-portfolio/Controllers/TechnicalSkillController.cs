@@ -25,6 +25,7 @@ public class TecnologyController : ControllerBase
     {
         User user = await this.dataContext.Users
             .Include(user => user.Technologies)
+            .ThenInclude(technology => technology.Image)
             .Where(user => user.Id == id)
             .FirstOrDefaultAsync();
 
@@ -40,7 +41,8 @@ public class TecnologyController : ControllerBase
             technologyDTOResponse.Add(new TechnologyDTOResponse
             {
                 Id = technology.Id,
-                Description = technology.Description
+                Description = technology.Description,
+                UrlImage = "/Image/" + (technology.Image != null ? technology.Image.Id.ToString() : "")
             });
         }
         return Ok(technologyDTOResponse);
@@ -66,7 +68,7 @@ public class TecnologyController : ControllerBase
         {
             Id = technologyDTOResponse.Id,
             Description = technologyDTOResponse.Description,
-            Image = new api_portafolio.Entities.Common.Image
+            Image = new Image
             {
                 Path = path,
                 UploadDate = DateTime.Now,

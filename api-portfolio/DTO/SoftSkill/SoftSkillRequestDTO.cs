@@ -42,7 +42,4 @@ public class SoftSkillRequestDTO
             this.image = value;
         } 
     }
-
-    public long? UserId;
-
 }

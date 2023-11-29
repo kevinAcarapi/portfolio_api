@@ -89,7 +89,7 @@ public class ProjectController : ControllerBase
             Id = projectResponseDTO.Id,
             Description = projectResponseDTO.Description,
             Enlace = projectResponseDTO.Enlace,
-            Image = new api_portafolio.Entities.Common.Image
+            Image = new Image
             {
                 Path = path,
                 UploadDate = DateTime.Now,

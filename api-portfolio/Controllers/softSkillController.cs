@@ -25,6 +25,7 @@ public class SoftSkillController : ControllerBase
     {
         User user = await this.dataContext.Users
             .Include(user => user.SoftSkills)
+            .ThenInclude(softSkill => softSkill.Image)
             .Where(user => user.Id == id)
             .FirstOrDefaultAsync();
 
@@ -40,7 +41,8 @@ public class SoftSkillController : ControllerBase
             softSkillResponseDTOs.Add(new SoftSkillResponseDTO
             {
                 Id = softSkill.Id,
-                Description = softSkill.Description
+                Description = softSkill.Description,
+                UrlImage = "/Image/" + (softSkill.Image != null ? softSkill.Image.Id.ToString() : "")
             });
         }
         return Ok(softSkillResponseDTOs);
@@ -65,12 +67,13 @@ public class SoftSkillController : ControllerBase
         {
             Id = softSkillResponseDTO.Id,
             Description = softSkillResponseDTO.Description,
-            Image = new api_portafolio.Entities.Common.Image
+            Image = new Image
             {
                 Path = path,
                 UploadDate = DateTime.Now,
                 Url = ""
             },
+
         };
 
         User? dbUser = await this.dataContext.Users.FindAsync(softSkillResponseDTO.UserId);
@@ -93,7 +96,7 @@ public class SoftSkillController : ControllerBase
 
         await this.dataContext.SaveChangesAsync();
 
-        return Ok();
+        return Ok(softSkillResponseDTO);
     }
 
     [HttpPut("{id}")]
