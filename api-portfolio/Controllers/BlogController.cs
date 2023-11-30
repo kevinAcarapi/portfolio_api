@@ -25,6 +25,7 @@ public class BlogController : ControllerBase
     {
         User? user = await this.dataContext.Users
             .Include(user => user.Blogs)
+            .ThenInclude(blog => blog.Imagen)
             .Where(user => user.Id == id)
             .FirstOrDefaultAsync();
 
@@ -42,7 +43,8 @@ public class BlogController : ControllerBase
                 Id = blog.Id,
                 Title = blog.Title,
                 Description = blog.Description,
-                Enlace = blog.Enlace
+                Enlace = blog.Enlace,
+                UrlImage = "/Image/" + (blog.Imagen != null ? blog.Imagen.Id.ToString() : "")
             });
         }
         return Ok(blogResponseDTOs);
@@ -69,7 +71,7 @@ public class BlogController : ControllerBase
             Title = blogResponseDTO.Title,
             Description = blogResponseDTO.Description,
             Enlace = blogResponseDTO.Enlace,
-            Imagen = new api_portafolio.Entities.Common.Image
+            Imagen = new Image
             {
                 Path = path,
                 UploadDate = DateTime.Now,
