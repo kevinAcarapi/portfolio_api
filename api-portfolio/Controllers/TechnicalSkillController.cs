@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using api_portafolio.Entities.Skills.TechnicalSkills;
 using System.Diagnostics.CodeAnalysis;
 using api_portafolio.DTO.Tecnology;
+using api_portafolio.DTO;
 using api_portafolio.Entities.Common;
 namespace api_portfolio.Controllers;
 
@@ -47,6 +48,65 @@ public class TecnologyController : ControllerBase
         }
         return Ok(technologyDTOResponse);
 
+    }
+
+    [HttpGet("type/{id}")]
+    public async Task<ActionResult<List<DTOListResponse>>> Get(
+        [FromRoute] long id, 
+        [FromQuery] DTOList dtoList)
+    {
+        //ResourceType? resourceType = await this.dataContext.ResourceTypes.FindAsync(id);
+        
+        //Primer cambio.
+        var query = this.dataContext.Technologies.AsQueryable();
+
+        if(!string.IsNullOrEmpty(dtoList.Query))
+        {
+            query = query.Where(technologies => technologies.Description.Contains(dtoList.Query));
+        }
+
+        if(!string.IsNullOrEmpty(dtoList.OrderBy))
+        {
+            query = query.OrderBy(technologies => technologies.Description);
+        }
+
+        int page = dtoList.Page != null ? dtoList.Page.Value : 1;
+        int pageSize = dtoList.PageSize != null ? dtoList.PageSize.Value : 10;
+
+        var count = await query.CountAsync();
+
+        var technologies = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        List<Object> dtos = new List<Object>();
+
+        foreach(Technology technology in technologies)
+        {
+            dtos.Add(new TechnologyDTOResponse
+            {
+                Description = technology.Description,
+                Id = technology.Id,
+                UrlImage = "/Image/" + (technology.Image != null ? technology.Image.Id.ToString() : "")            
+            });
+        }
+
+        int pageCount = (count / pageSize) + 1;
+
+
+        return Ok(new DTOListResponse
+        {
+            HasNextPage = (page + 1) <= pageCount,
+            HasPrevPage = page > 1,
+            List = dtos,
+            NextPage = (page + 1) <= pageCount ? page + 1 : page,
+            Page = page,
+            PageSize = pageSize,
+            PrevPage = page > 1 ? page - 1 : 1,
+            TotalCount = count,
+            TotalPage = pageCount
+        });
     }
 
     [HttpPost]
