@@ -102,7 +102,7 @@ public class UserController : ControllerBase
                 Description = user.Description,
                 Gmail = user.Gmail,
                 Profesion = user.Profesion,
-                urlImage = "/Image/" + (user.Image != null ? user.Image.Path.ToString() : "")
+                urlImage = "/Image/" + (user.Image != null ? user.Image.Id.ToString() : "")
             });
         }
 

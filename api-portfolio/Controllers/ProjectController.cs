@@ -80,12 +80,12 @@ public class ProjectController : ControllerBase
 
         if (!string.IsNullOrEmpty(dtoList.Query))
         {
-            query = query.Where(projects => projects.Description.Contains(dtoList.Query));
+            query = query.Where(projects => projects.Title.Contains(dtoList.Query));
         }
 
         if (!string.IsNullOrEmpty(dtoList.OrderBy))
         {
-            query = query.OrderBy(projects => projects.Description);
+            query = query.OrderBy(projects => projects.Title);
         }
 
         int page = dtoList.Page != null ? dtoList.Page.Value : 1;
