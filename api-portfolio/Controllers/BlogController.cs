@@ -61,12 +61,12 @@ public class BlogController : ControllerBase
 
         if (!string.IsNullOrEmpty(dtoList.Query))
         {
-            query = query.Where(blogs => blogs.Description.Contains(dtoList.Query));
+            query = query.Where(blogs => blogs.Title.Contains(dtoList.Query));
         }
 
         if (!string.IsNullOrEmpty(dtoList.OrderBy))
         {
-            query = query.OrderBy(blogs => blogs.Description);
+            query = query.OrderBy(blogs => blogs.Title);
         }
 
         int page = dtoList.Page != null ? dtoList.Page.Value : 1;
