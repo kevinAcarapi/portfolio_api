@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using api_portafolio.Entities.Skills.TechnicalSkills;
 using System.Diagnostics.CodeAnalysis;
 using api_portafolio.DTO.Tecnology;
-using api_portafolio.DTO;
+using api_portafolio.DTO.PaginatedDTO;
 using api_portafolio.Entities.Common;
 namespace api_portfolio.Controllers;
 
@@ -43,7 +43,7 @@ public class TecnologyController : ControllerBase
             {
                 Id = technology.Id,
                 Description = technology.Description,
-                UrlImage = "/Image/" + (technology.Image != null ? technology.Image.Id.ToString() : "")
+                UrlImage = "/Image/" + (technology.Image != null ? technology.Image.Path.ToString() : "")
             });
         }
         return Ok(technologyDTOResponse);

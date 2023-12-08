@@ -1,4 +1,4 @@
-namespace api_portafolio.DTO;
+namespace api_portafolio.DTO.PaginatedDTO;
 
 public class DTOListResponse
 {

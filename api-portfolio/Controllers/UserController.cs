@@ -13,6 +13,7 @@ using api_portafolio.Entities.Projects;
 using api_portafolio.DTO.ProjectDTO;
 using api_portafolio.Entities.Blogs;
 using api_portafolio.Entities.Common;
+using api_portafolio.DTO.PaginatedDTO;
 using api_portafolio.Entities.TechnologiesCatalog;
 
 namespace api_portfolio.Controllers;
@@ -59,6 +60,66 @@ public class UserController : ControllerBase
             return NotFound("Usuario no encontrado");
         }
         return Ok(userResponseDTO);
+    }
+
+    [HttpGet("type/{id}")]
+    public async Task<ActionResult<List<DTOListResponse>>> Get(
+        [FromRoute] long id,
+        [FromQuery] DTOList dtoList)
+    {
+        // Primer cambio.
+        var query = this.dataContext.Users.AsQueryable();
+
+        if (!string.IsNullOrEmpty(dtoList.Query))
+        {
+            query = query.Where(user => user.Nombre.Contains(dtoList.Query));
+        }
+
+        if (!string.IsNullOrEmpty(dtoList.OrderBy))
+        {
+            query = query.OrderBy(user => user.Nombre);
+        }
+
+        int page = dtoList.Page != null ? dtoList.Page.Value : 1;
+        int pageSize = dtoList.PageSize != null ? dtoList.PageSize.Value : 10;
+
+        var count = await query.CountAsync();
+
+        var users = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        List<Object> dtos = new List<Object>();
+
+        foreach (User user in users)
+        {
+            dtos.Add(new UserResponseDTO
+            {
+                Id = user.Id,
+                Apellido = user.Apellido,
+                Nombre = user.Nombre,
+                Description = user.Description,
+                Gmail = user.Gmail,
+                Profesion = user.Profesion,
+                urlImage = "/Image/" + (user.Image != null ? user.Image.Path.ToString() : "")
+            });
+        }
+
+        int pageCount = (count / pageSize) + 1;
+
+        return Ok(new DTOListResponse
+        {
+            HasNextPage = (page + 1) <= pageCount,
+            HasPrevPage = page > 1,
+            List = dtos,
+            NextPage = (page + 1) <= pageCount ? page + 1 : page,
+            Page = page,
+            PageSize = pageSize,
+            PrevPage = page > 1 ? page - 1 : 1,
+            TotalCount = count,
+            TotalPage = pageCount
+        });
     }
 
     // Metodo Post

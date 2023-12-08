@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using api_portafolio.Entities.Blogs;
 using System.Diagnostics.CodeAnalysis;
 using api_portafolio.DTO.BlogsDTO;
+using api_portafolio.DTO.PaginatedDTO;
 using api_portafolio.Entities.Common;
 namespace api_portfolio.Controllers;
 
@@ -49,6 +50,65 @@ public class BlogController : ControllerBase
         }
         return Ok(blogResponseDTOs);
     }
+
+    [HttpGet("type/{id}")]
+    public async Task<ActionResult<List<DTOListResponse>>> Get(
+        [FromRoute] long id,
+        [FromQuery] DTOList dtoList)
+    {
+        // Primer cambio.
+        var query = this.dataContext.Blogs.AsQueryable();
+
+        if (!string.IsNullOrEmpty(dtoList.Query))
+        {
+            query = query.Where(blogs => blogs.Description.Contains(dtoList.Query));
+        }
+
+        if (!string.IsNullOrEmpty(dtoList.OrderBy))
+        {
+            query = query.OrderBy(blogs => blogs.Description);
+        }
+
+        int page = dtoList.Page != null ? dtoList.Page.Value : 1;
+        int pageSize = dtoList.PageSize != null ? dtoList.PageSize.Value : 10;
+
+        var count = await query.CountAsync();
+
+        var blogs = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        List<Object> dtos = new List<Object>();
+
+        foreach (Blog blog in blogs)
+        {
+            dtos.Add(new BlogResponseDTO
+            {
+                Id = blog.Id,
+                Title = blog.Title,
+                Description = blog.Description,
+                Enlace = blog.Enlace,
+                UrlImage = "/Image/" + (blog.Imagen != null ? blog.Imagen.Id.ToString() : "")
+            });
+        }
+
+        int pageCount = (count / pageSize) + 1;
+
+        return Ok(new DTOListResponse
+        {
+            HasNextPage = (page + 1) <= pageCount,
+            HasPrevPage = page > 1,
+            List = dtos,
+            NextPage = (page + 1) <= pageCount ? page + 1 : page,
+            Page = page,
+            PageSize = pageSize,
+            PrevPage = page > 1 ? page - 1 : 1,
+            TotalCount = count,
+            TotalPage = pageCount
+        });
+    }
+
 
     [HttpPost]
     public async Task<ActionResult> Post([FromForm] BlogResponseDTO blogResponseDTO)
