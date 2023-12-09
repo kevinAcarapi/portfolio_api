@@ -70,9 +70,8 @@ public class ProjectController : ControllerBase
         return Ok(projectResponseDTOs);
     }
 
-    [HttpGet("type/{id}")]
+    [HttpGet]
     public async Task<ActionResult<List<DTOListResponse>>> Get(
-        [FromRoute] long id,
         [FromQuery] DTOList dtoList)
     {
         // Primer cambio.
@@ -94,6 +93,7 @@ public class ProjectController : ControllerBase
         var count = await query.CountAsync();
 
         var projects = await query
+            .Include(project => project.Image)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
@@ -129,43 +129,43 @@ public class ProjectController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult> Post([FromForm] ProjectResponseDTO projectResponseDTO)
+    public async Task<ActionResult> Post([FromForm] ProjectRequestDTO projectRequestDTO)
     {
-        if (projectResponseDTO.Imagen == null)
+        if (projectRequestDTO.Imagen == null)
         {
             return BadRequest("Archivo no encontrado");
         };
 
-        string path = Path.Combine(Directory.GetCurrentDirectory(), "Archivos", "projectPhotos", projectResponseDTO.Imagen.FileName);
+        string path = Path.Combine(Directory.GetCurrentDirectory(), "Archivos", "projectPhotos", projectRequestDTO.Imagen.FileName);
 
         using (var stream = new FileStream(path, FileMode.Create))
         {
-            await projectResponseDTO.Imagen.CopyToAsync(stream);
+            await projectRequestDTO.Imagen.CopyToAsync(stream);
         };
 
         Project project = new Project
         {
-            Id = projectResponseDTO.Id,
-            Description = projectResponseDTO.Description,
-            Enlace = projectResponseDTO.Enlace,
+            Id = projectRequestDTO.Id,
+            Description = projectRequestDTO.Description,
+            Enlace = projectRequestDTO.Enlace,
             Image = new Image
             {
                 Path = path,
                 UploadDate = DateTime.Now,
                 Url = ""
             },
-            Title = projectResponseDTO.Title,
+            Title = projectRequestDTO.Title,
         };
 
-        User? dbUser = await this.dataContext.Users.FindAsync(projectResponseDTO.UserId);
+        User? dbUser = await this.dataContext.Users.FindAsync(projectRequestDTO.UserId);
         if (dbUser == null)
         {
             return NotFound("Usuario no encontrado");
         }
 
-        if (projectResponseDTO.UserId.HasValue)
+        if (projectRequestDTO.UserId.HasValue)
         {
-            var existingUser = await this.dataContext.Users.FindAsync(projectResponseDTO.UserId.Value);
+            var existingUser = await this.dataContext.Users.FindAsync(projectRequestDTO.UserId.Value);
             if (existingUser == null)
             {
                 return BadRequest("Usuario no encontrado");
@@ -174,8 +174,8 @@ public class ProjectController : ControllerBase
         }
 
   
-        Technology? dbTechnology = await this.dataContext.Technologies.FindAsync(projectResponseDTO.TechnologyId);
-        if (dbTechnology == null && projectResponseDTO.TechnologyId.HasValue)
+        Technology? dbTechnology = await this.dataContext.Technologies.FindAsync(projectRequestDTO.TechnologyId);
+        if (dbTechnology == null && projectRequestDTO.TechnologyId.HasValue)
             {
                 return NotFound("Tecnologia no encontrada");
             }

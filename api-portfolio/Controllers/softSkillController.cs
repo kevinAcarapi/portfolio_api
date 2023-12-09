@@ -49,9 +49,8 @@ public class SoftSkillController : ControllerBase
         return Ok(softSkillResponseDTOs);
     }
 
-    [HttpGet("type/{id}")]
+    [HttpGet]
     public async Task<ActionResult<List<DTOListResponse>>> Get(
-        [FromRoute] long id,
         [FromQuery] DTOList dtoList)
     {
         // Primer cambio.
@@ -73,6 +72,7 @@ public class SoftSkillController : ControllerBase
         var count = await query.CountAsync();
 
         var softSkills = await query
+            .Include(softSkill => softSkill.Image)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
@@ -106,24 +106,24 @@ public class SoftSkillController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult> Post([FromForm] SoftSkillResponseDTO softSkillResponseDTO)
+    public async Task<ActionResult> Post([FromForm] SoftSkillRequestDTO softSkillRequestDTO)
     {
-        if (softSkillResponseDTO.Image == null)
+        if (softSkillRequestDTO.Image == null)
         {
             return BadRequest("Archivo no encontrado");
         };
 
-        string path = Path.Combine(Directory.GetCurrentDirectory(), "Archivos", "softSkillsPhotos", softSkillResponseDTO.Image.FileName);
+        string path = Path.Combine(Directory.GetCurrentDirectory(), "Archivos", "softSkillsPhotos", softSkillRequestDTO.Image.FileName);
 
         using (var stream = new FileStream(path, FileMode.Create))
         {
-            await softSkillResponseDTO.Image.CopyToAsync(stream);
+            await softSkillRequestDTO.Image.CopyToAsync(stream);
         };
 
         SoftSkill softSkill = new SoftSkill
         {
-            Id = softSkillResponseDTO.Id,
-            Description = softSkillResponseDTO.Description,
+            Id = softSkillRequestDTO.Id,
+            Description = softSkillRequestDTO.Description,
             Image = new Image
             {
                 Path = path,
@@ -133,15 +133,15 @@ public class SoftSkillController : ControllerBase
 
         };
 
-        User? dbUser = await this.dataContext.Users.FindAsync(softSkillResponseDTO.UserId);
+        User? dbUser = await this.dataContext.Users.FindAsync(softSkillRequestDTO.UserId);
         if (dbUser == null)
         {
             return NotFound("Usuario no encontrado");
         }
 
-        if (softSkillResponseDTO.UserId.HasValue)
+        if (softSkillRequestDTO.UserId.HasValue)
         {
-            var existingUser = await this.dataContext.Users.FindAsync(softSkillResponseDTO.UserId.Value);
+            var existingUser = await this.dataContext.Users.FindAsync(softSkillRequestDTO.UserId.Value);
             if (existingUser == null)
             {
                 return BadRequest("Usuario no encontrado");
@@ -153,7 +153,7 @@ public class SoftSkillController : ControllerBase
 
         await this.dataContext.SaveChangesAsync();
 
-        return Ok(softSkillResponseDTO);
+        return Ok(softSkillRequestDTO);
     }
 
     [HttpPut("{id}")]

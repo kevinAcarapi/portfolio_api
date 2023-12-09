@@ -105,7 +105,7 @@ public class UserRequestDTO
         }
     }
 
-    
+    public string? urlImage {get; set;}
     public List<long>? ProjectId {get;set;}
     public List<long>? BlogId {get;set;}
     public List<long>?  TecnologyId {get;set;}

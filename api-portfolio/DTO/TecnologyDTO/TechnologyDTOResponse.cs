@@ -53,15 +53,5 @@ public class TechnologyDTOResponse
             this.urlImage = value;
         } 
     }
-    private long? userId;
-    public long? UserId{
-        get
-        {
-            return this.userId;
-        }
-        set
-        {
-            this.userId = value;
-        }
-    }
+
 }

@@ -62,9 +62,8 @@ public class UserController : ControllerBase
         return Ok(userResponseDTO);
     }
 
-    [HttpGet("type/{id}")]
+    [HttpGet]
     public async Task<ActionResult<List<DTOListResponse>>> Get(
-        [FromRoute] long id,
         [FromQuery] DTOList dtoList)
     {
         // Primer cambio.
@@ -86,6 +85,7 @@ public class UserController : ControllerBase
         var count = await query.CountAsync();
 
         var users = await query
+            .Include(user => user.Image)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
@@ -124,29 +124,29 @@ public class UserController : ControllerBase
 
     // Metodo Post
     [HttpPost]
-    public async Task<ActionResult> Post([FromForm] UserResponseDTO userResponseDTO)
+    public async Task<ActionResult> Post([FromForm] UserRequestDTO userRequestDTO)
     {
-        if (userResponseDTO.Image == null)
+        if (userRequestDTO.Image == null)
         {
             return BadRequest("Archivo no encontrado");
         };
 
-        var path = Path.Combine(Directory.GetCurrentDirectory(), "Archivos", "profilePhotos", userResponseDTO.Image.FileName);
+        var path = Path.Combine(Directory.GetCurrentDirectory(), "Archivos", "profilePhotos", userRequestDTO.Image.FileName);
 
         using (var stream = new FileStream(path, FileMode.Create))
         {
-            await userResponseDTO.Image.CopyToAsync(stream);
+            await userRequestDTO.Image.CopyToAsync(stream);
         };
 
         User user = new User
         {
-            Id = userResponseDTO.Id,
-            Apellido = userResponseDTO.Apellido,
-            Nombre = userResponseDTO.Nombre,
-            Description = userResponseDTO.Description,
-            Curriculum = userResponseDTO.Curriculum,
-            Gmail = userResponseDTO.Gmail,
-            Profesion = userResponseDTO.Profesion,
+            Id = userRequestDTO.Id,
+            Apellido = userRequestDTO.Apellido,
+            Nombre = userRequestDTO.Nombre,
+            Description = userRequestDTO.Description,
+            Curriculum = userRequestDTO.Curriculum,
+            Gmail = userRequestDTO.Gmail,
+            Profesion = userRequestDTO.Profesion,
             Image = new Image
             {
                 Path = path,
@@ -156,10 +156,10 @@ public class UserController : ControllerBase
 
         };
 
-        if (userResponseDTO.ProjectId != null && userResponseDTO.ProjectId.Count > 0)
+        if (userRequestDTO.ProjectId != null && userRequestDTO.ProjectId.Count > 0)
         {
             user.Projects = new List<Project> { };
-            foreach (long item in userResponseDTO.ProjectId)
+            foreach (long item in userRequestDTO.ProjectId)
             {
                 var existingProject = await this.dataContext.Projects.FindAsync(item);
                 if (existingProject == null)
@@ -170,10 +170,10 @@ public class UserController : ControllerBase
             }
         }
 
-        if (userResponseDTO.BlogId != null && userResponseDTO.BlogId.Count > 0)
+        if (userRequestDTO.BlogId != null && userRequestDTO.BlogId.Count > 0)
         {
             user.Blogs = new List<Blog> { };
-            foreach (long item in userResponseDTO.BlogId)
+            foreach (long item in userRequestDTO.BlogId)
             {
                 var existingBlog = await this.dataContext.Blogs.FindAsync(item);
                 if (existingBlog == null)
@@ -184,10 +184,10 @@ public class UserController : ControllerBase
             }
         }
 
-        if (userResponseDTO.TecnologyId != null && userResponseDTO.TecnologyId.Count > 0)
+        if (userRequestDTO.TecnologyId != null && userRequestDTO.TecnologyId.Count > 0)
         {
             user.Technologies = new List<Technology> { };
-            foreach (long item in userResponseDTO.TecnologyId)
+            foreach (long item in userRequestDTO.TecnologyId)
             {
                 var existingTecnology = await this.dataContext.Technologies.FindAsync(item);
                 if (existingTecnology == null)
@@ -198,10 +198,10 @@ public class UserController : ControllerBase
             }
         }
 
-        if (userResponseDTO.SoftSkillId != null && userResponseDTO.SoftSkillId.Count > 0)
+        if (userRequestDTO.SoftSkillId != null && userRequestDTO.SoftSkillId.Count > 0)
         {
             user.SoftSkills = new List<SoftSkill> { };
-            foreach (long item in userResponseDTO.SoftSkillId)
+            foreach (long item in userRequestDTO.SoftSkillId)
             {
                 var existingSoftSkill = await this.dataContext.SoftSkills.FindAsync(item);
                 if (existingSoftSkill == null)

@@ -50,9 +50,8 @@ public class TecnologyController : ControllerBase
 
     }
 
-    [HttpGet("type/{id}")]
+    [HttpGet]
     public async Task<ActionResult<List<DTOListResponse>>> Get(
-        [FromRoute] long id, 
         [FromQuery] DTOList dtoList)
     {
         //ResourceType? resourceType = await this.dataContext.ResourceTypes.FindAsync(id);
@@ -76,6 +75,7 @@ public class TecnologyController : ControllerBase
         var count = await query.CountAsync();
 
         var technologies = await query
+            .Include(technology => technology.Image)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
@@ -110,24 +110,24 @@ public class TecnologyController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult> Post([FromForm] TechnologyDTOResponse technologyDTOResponse)
+    public async Task<ActionResult> Post([FromForm] TechnologyDTORequest technologyDTORequest)
     {
-        if (technologyDTOResponse.Image == null)
+        if (technologyDTORequest.Image == null)
         {
             return BadRequest("Archivo no encontrado");
         };
 
-        string path = Path.Combine(Directory.GetCurrentDirectory(), "Archivos", "technologyPhotos", technologyDTOResponse.Image.FileName);
+        var path = Path.Combine(Directory.GetCurrentDirectory(), "Archivos", "technologyPhotos", technologyDTORequest.Image.FileName);
 
         using (var stream = new FileStream(path, FileMode.Create))
         {
-            await technologyDTOResponse.Image.CopyToAsync(stream);
+            await technologyDTORequest.Image.CopyToAsync(stream);
         };
 
         Technology technology = new Technology
         {
-            Id = technologyDTOResponse.Id,
-            Description = technologyDTOResponse.Description,
+            Id = technologyDTORequest.Id,
+            Description = technologyDTORequest.Description,
             Image = new Image
             {
                 Path = path,
@@ -136,15 +136,15 @@ public class TecnologyController : ControllerBase
             },
         };
 
-        User? dbUser = await this.dataContext.Users.FindAsync(technologyDTOResponse.UserId);
+        User? dbUser = await this.dataContext.Users.FindAsync(technologyDTORequest.UserId);
         if (dbUser == null)
         {
             return NotFound("Usuario no encontrado");
         }
 
-        if (technologyDTOResponse.UserId.HasValue)
+        if (technologyDTORequest.UserId.HasValue)
         {
-            var existingUser = await this.dataContext.Users.FindAsync(technologyDTOResponse.UserId.Value);
+            var existingUser = await this.dataContext.Users.FindAsync(technologyDTORequest.UserId.Value);
             if (existingUser == null)
             {
                 return BadRequest("Usuario no encontrado");

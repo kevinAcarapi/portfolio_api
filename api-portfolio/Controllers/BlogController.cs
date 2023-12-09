@@ -51,9 +51,8 @@ public class BlogController : ControllerBase
         return Ok(blogResponseDTOs);
     }
 
-    [HttpGet("type/{id}")]
+    [HttpGet]
     public async Task<ActionResult<List<DTOListResponse>>> Get(
-        [FromRoute] long id,
         [FromQuery] DTOList dtoList)
     {
         // Primer cambio.
@@ -75,6 +74,7 @@ public class BlogController : ControllerBase
         var count = await query.CountAsync();
 
         var blogs = await query
+            .Include(blog => blog.Imagen)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
@@ -111,26 +111,26 @@ public class BlogController : ControllerBase
 
 
     [HttpPost]
-    public async Task<ActionResult> Post([FromForm] BlogResponseDTO blogResponseDTO)
+    public async Task<ActionResult> Post([FromForm] BlogRequestDTO blogRequestDTO)
     {
-        if (blogResponseDTO.Imagen == null)
+        if (blogRequestDTO.Imagen == null)
         {
             return BadRequest("Archivo no encontrado");
         };
 
-        string path = Path.Combine(Directory.GetCurrentDirectory(), "Archivos", "blogPhotos", blogResponseDTO.Imagen.FileName);
+        string path = Path.Combine(Directory.GetCurrentDirectory(), "Archivos", "blogPhotos", blogRequestDTO.Imagen.FileName);
 
         using (var stream = new FileStream(path, FileMode.Create))
         {
-            await blogResponseDTO.Imagen.CopyToAsync(stream);
+            await blogRequestDTO.Imagen.CopyToAsync(stream);
         };
 
         Blog blog = new Blog
         {
-            Id = blogResponseDTO.Id,
-            Title = blogResponseDTO.Title,
-            Description = blogResponseDTO.Description,
-            Enlace = blogResponseDTO.Enlace,
+            Id = blogRequestDTO.Id,
+            Title = blogRequestDTO.Title,
+            Description = blogRequestDTO.Description,
+            Enlace = blogRequestDTO.Enlace,
             Imagen = new Image
             {
                 Path = path,
@@ -139,15 +139,15 @@ public class BlogController : ControllerBase
             },
         };
 
-        User? dbUser = await this.dataContext.Users.FindAsync(blogResponseDTO.UserId);
+        User? dbUser = await this.dataContext.Users.FindAsync(blogRequestDTO.UserId);
         if (dbUser == null)
         {
             return NotFound("Usuario no encontrado");
         }
 
-        if (blogResponseDTO.UserId.HasValue)
+        if (blogRequestDTO.UserId.HasValue)
         {
-            var existingUser = await this.dataContext.Users.FindAsync(blogResponseDTO.UserId.Value);
+            var existingUser = await this.dataContext.Users.FindAsync(blogRequestDTO.UserId.Value);
             if (existingUser == null)
             {
                 return BadRequest("Usuario no encontrado");
